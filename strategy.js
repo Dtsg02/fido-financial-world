@@ -1,5 +1,5 @@
-import { ensureLate, regionFor } from "./late.js";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js";
+import { ensureLate, regionFor } from "./late.js?v=20261026-industry";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=20261026-industry";
 import {
   CITIES,
   SUPPLIERS,
@@ -13,7 +13,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js";
+} from "./world.js?v=20261026-industry";
 export const strategyPages = [
   "World",
   "Operations",

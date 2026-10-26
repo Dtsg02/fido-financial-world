@@ -1,6 +1,6 @@
-import { TYPES, INDUSTRY } from "./catalog.js";
-import { CITIES, rng, city, report } from "./world.js";
-import { ensureEmpire, has } from "./empire.js";
+import { TYPES, INDUSTRY } from "./catalog.js?v=20261026-industry";
+import { CITIES, rng, city, report } from "./world.js?v=20261026-industry";
+import { ensureEmpire, has } from "./empire.js?v=20261026-industry";
 export const REGIONS = [
   {
     id: "home",

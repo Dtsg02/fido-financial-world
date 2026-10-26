@@ -1,4 +1,4 @@
-import { TYPES, INDUSTRY } from "./catalog.js";
+import { TYPES, INDUSTRY } from "./catalog.js?v=20261026-industry";
 // Interconnected strategy systems. All randomness uses the save's seeded generator.
 export const CITIES = [
   {

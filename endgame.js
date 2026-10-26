@@ -1,6 +1,6 @@
-import { fresh, start, worth, log, TYPES } from "./engine.js";
-import { CITIES } from "./world.js";
-import { RESEARCH, ensureEmpire } from "./empire.js";
+import { fresh, start, worth, log, TYPES } from "./engine.js?v=20261026-industry";
+import { CITIES } from "./world.js?v=20261026-industry";
+import { RESEARCH, ensureEmpire } from "./empire.js?v=20261026-industry";
 import {
   REGIONS,
   CITY_REGION,
@@ -27,7 +27,7 @@ import {
   upgradeHQ,
   adminMultiplier,
   completed,
-} from "./late.js";
+} from "./late.js?v=20261026-industry";
 export const endgamePages = [
   "International",
   "Megaprojects",

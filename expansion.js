@@ -7,8 +7,8 @@ import {
   advance,
   resolve,
   log,
-} from "./engine.js";
-import { INDUSTRY } from "./catalog.js";
+} from "./engine.js?v=20261026-industry";
+import { INDUSTRY } from "./catalog.js?v=20261026-industry";
 import {
   COMMODITIES,
   CITIES,
@@ -16,7 +16,7 @@ import {
   productivity,
   materialFactor,
   demandFactor,
-} from "./world.js";
+} from "./world.js?v=20261026-industry";
 import {
   ROLES,
   FX,
@@ -46,7 +46,7 @@ import {
   customerMultiplier,
   deepMaterial,
   deepCapacity,
-} from "./empire.js";
+} from "./empire.js?v=20261026-industry";
 export const expansionPages = [
   "Supply",
   "Talent",

@@ -1,5 +1,5 @@
-import { TYPES, INDUSTRY } from "./catalog.js";
-import { rng, ensureWorld, city, supplier, report } from "./world.js";
+import { TYPES, INDUSTRY } from "./catalog.js?v=20261026-industry";
+import { rng, ensureWorld, city, supplier, report } from "./world.js?v=20261026-industry";
 export const ROLES = [
   {
     id: "coo",

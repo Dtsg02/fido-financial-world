@@ -1,6 +1,6 @@
-import { TYPES } from "./catalog.js";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js";
+import { TYPES } from "./catalog.js?v=20261026-industry";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=20261026-industry";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=20261026-industry";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;

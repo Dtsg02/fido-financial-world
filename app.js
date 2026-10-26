@@ -1,14 +1,14 @@
-import { industryContent, industryAction } from "./industry-ui.js";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js";
-import { ensureLate, lateAssets } from "./late.js";
+import { industryContent, industryAction } from "./industry-ui.js?v=20261026-industry";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=20261026-industry";
+import { ensureLate, lateAssets } from "./late.js?v=20261026-industry";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js";
-import { ensureEmpire, additionalAssets } from "./empire.js";
-import { ensureWorld, canSell, city } from "./world.js";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js";
+} from "./expansion.js?v=20261026-industry";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=20261026-industry";
+import { ensureWorld, canSell, city } from "./world.js?v=20261026-industry";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=20261026-industry";
 import {
   TYPES,
   ASSETS,
@@ -24,7 +24,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js";
+} from "./engine.js?v=20261026-industry";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {

@@ -3,8 +3,8 @@ import {
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js";
-import { validateAdvanced } from "./advanced-validation.js";
+} from "./sectors.js?v=20261026-industry";
+import { validateAdvanced } from "./advanced-validation.js?v=20261026-industry";
 import {
   ensureLate,
   internationalDemand,
@@ -14,7 +14,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js";
+} from "./late.js?v=20261026-industry";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -27,8 +27,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js";
-import { validateExtra } from "./validation.js";
+} from "./empire.js?v=20261026-industry";
+import { validateExtra } from "./validation.js?v=20261026-industry";
 import {
   ensureWorld,
   initBusiness,
@@ -40,8 +40,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js";
-import { TYPES } from "./catalog.js";
+} from "./world.js?v=20261026-industry";
+import { TYPES } from "./catalog.js?v=20261026-industry";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
