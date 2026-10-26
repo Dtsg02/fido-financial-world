@@ -1300,3 +1300,11 @@ details > summary:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+.industry-layout > div { min-width: 0; }
+.industry-card .balance-line { gap: 12px; flex-wrap: wrap; }
+.industry-card .split { gap: 14px; flex-wrap: wrap; }
+.industry-card h2, .industry-card h3 { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .industry-card .balance-line > span { flex: 1 1 130px; }
+  .industry-card .balance-line > b { margin-left: auto; }
+}
