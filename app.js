@@ -1,3 +1,4 @@
+import { industryContent, industryAction } from "./industry-ui.js";
 import { endgamePages, endgameContent, endgameAction } from "./endgame.js";
 import { ensureLate, lateAssets } from "./late.js";
 import {
@@ -78,6 +79,27 @@ Object.assign(paths, {
   Treasury:
     "M3 6c0-4 18-4 18 0s-18 4-18 0 M3 6v6c0 4 18 4 18 0V6 M3 12v6c0 4 18 4 18 0v-6",
 });
+Object.assign(paths, {
+  Industries: "M3 21V9l6 4V7l6 4V3h6v18H3z M7 17h2 M13 17h2",
+  Supply: "M3 7l9-5 9 5v13H3z M3 7l9 5 9-5 M12 12v10",
+  Talent: paths.Competitors,
+  Exchange: "M3 7h17l-4-4 M21 17H4l4 4",
+  Trading: paths.Markets,
+  Ownership: "M12 2v10h10 M9 3a9 9 0 1012 12",
+  Innovation: "M8 17h8 M9 21h6 M8 14a7 7 0 118 0v3H8z",
+  Development: "M3 21h18 M6 21V4h12 M6 8h15 M18 8v8 M16 16h4",
+  Franchises: "M12 3v8 M5 11h14 M5 11v8 M19 11v8 M2 19h6v3H2z M16 19h6v3h-6z",
+  Milestones: "M5 22V3h14l-4 5 4 5H5",
+  Planner: "M5 3v18 M12 3v18 M19 3v18 M2 7h6 M9 15h6 M16 9h6",
+  International: paths.World,
+  Megaprojects:
+    "M2 22h20 M5 22V10h5V3h5v7h4v12 M8 14h2 M14 14h2 M8 18h2 M14 18h2",
+  Ventures: "M6 16l-3 5 5-3 M8 16l-3-3 5-4 3-5 8-2-2 8-5 3-4 5z M14 7h3v3h-3z",
+  Bank: paths.Banking,
+  Headquarters: paths.Businesses,
+  Dynasty: "M3 7l5 5 4-8 4 8 5-5-3 13H6z M6 22h12",
+  Scenarios: "M4 3h16v18H4z M8 7h.01 M16 7h.01 M12 12h.01 M8 17h.01 M16 17h.01",
+});
 const icon = (n) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[n] || paths.Overview}"/></svg>`;
 const btn = (label, act, cls = "", disabled = false) =>
@@ -155,6 +177,8 @@ function render() {
     `<aside><div class="brand">fi<span>do.</span></div><div class="brand-sub">FINANCIAL WORLD DOMINATION</div><div class="nav-label">BUILD YOUR EMPIRE</div>${navigation()}<div class="aside-bottom"><button class="nav" data-action="help" title="How to play">${icon("help")}<span>Field guide</span></button><button class="nav ${page === "Settings" ? "active" : ""}" data-page="Settings" title="Settings">${icon("Settings")}<span>Settings & saves</span></button><div class="founder"><div class="avatar">Y</div><div>You, the founder<br><small>${worth(s) >= 1e6 ? "Empire builder" : worth(s) >= 100000 ? "Entrepreneur" : "Aspiring entrepreneur"}</small></div></div></div></aside><div class="shell"><header><div class="breadcrumb">Your workspace &nbsp; / &nbsp; <b>${page}</b></div><div class="top-right"><span class="pill"><span class="dot"></span>Sandbox mode</span><span class="date">◷ &nbsp; ${date()} <span class="muted">· Month ${s.month + 1}</span></span>${btn("Run quarter", "quarter", "light")} ${btn("Next month " + icon("arrow"), "advance")}</div></header><main>${content()}<div class="footer"><span>Small beginnings. Unlimited possibilities.</span><span>Single-player sandbox &nbsp; · &nbsp; Auto-saved locally &nbsp; ●</span></div></main></div>`;
 }
 function content() {
+  if (page === "Industries")
+    return industryContent(s, { heading, btn, money, esc, stat });
   if (endgamePages.includes(page))
     return endgameContent(page, s, { heading, btn, money, esc, stat, spark });
   if (expansionPages.includes(page))
@@ -195,10 +219,10 @@ function overview() {
         : "Every decision writes the next chapter of your empire.",
       btn(icon("plus") + " Start a business", "catalog"),
     ) +
-    `<div class="stats">${stat("Net worth", money(nw), `<span class="${growth >= 0 ? "positive" : "negative"}">${growth >= 0 ? "↗" : "↘"} ${growth.toFixed(1)}%</span> &nbsp; since day one`, "Markets")}${stat("Available cash", money(s.cash), "Ready for your next move", "wallet")}${stat("Monthly net profit", money(s.profit), s.month ? '<span class="' + (s.profit >= 0 ? "positive" : "negative") + '">Last month, after taxes & costs</span>' : "Your story starts this month", "Businesses")}${stat("Active businesses", s.businesses.length, `${s.businesses.reduce((n, b) => n + b.staff, 0)} employees · ${s.properties.length} properties`, "Properties")}</div><div class="grid"><div class="stack"><section class="card"><div class="card-head"><div><h2>Your empire, over time</h2><small>Good things are built one decision at a time.</small></div><span class="tag">${s.month < 12 ? "ALL TIME" : "LAST 60 MONTHS"}</span></div><div class="split"><div><span style="font:700 26px Manrope">${money(nw)}</span> <small>net worth</small></div><span class="chart-key"><i></i> Total net worth</span></div>${spark(
+    `<div class="stats">${stat("Net worth", money(nw), `<span class="${growth >= 0 ? "positive" : "negative"}">${growth >= 0 ? "↗" : "↘"} ${growth.toFixed(1)}%</span> &nbsp; since day one`, "Markets")}${stat("Available cash", money(s.cash), "Ready for your next move", "wallet")}${stat("Monthly net profit", money(s.profit), s.month ? '<span class="' + (s.profit >= 0 ? "positive" : "negative") + '">Last month, after taxes & costs</span>' : "Your story starts this month", "Businesses")}${stat("Active businesses", s.businesses.length, `${s.businesses.reduce((n, b) => n + b.staff, 0)} employees · ${s.properties.length} properties`, "Properties")}</div><div class="grid"><div class="stack"><section class="card"><div class="card-head"><div><h2>Your empire, over time</h2><small>Good things are built one decision at a time.</small></div><span class="tag">${s.history.length < 60 ? "ALL TIME" : "LAST 60 MONTHS"}</span></div><div class="split"><div><span style="font:700 26px Manrope">${money(nw)}</span> <small>net worth</small></div><span class="chart-key"><i></i> Total net worth</span></div>${spark(
       s.history.map((h) => h.worth),
       true,
-    )}<div class="chart-labels"><span>JAN 2026</span><span>${s.month === 0 ? "YOUR JOURNEY BEGINS HERE" : date().toUpperCase()}</span><span>${s.month === 0 ? "THE FUTURE IS YOURS" : "MONTH " + (s.month + 1)}</span></div></section><section class="card"><div class="card-head"><div><h2>Your businesses <small style="display:inline;margin-left:7px">${s.businesses.length}</small></h2><small>The engines of your growing empire.</small></div><button class="text-btn" data-page="Businesses">Manage businesses ↗</button></div>${
+    )}<div class="chart-labels"><span>${new Date(2026, s.history[0]?.month || 0, 1).toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase()}</span><span>${s.month === 0 ? "YOUR JOURNEY BEGINS HERE" : date().toUpperCase()}</span><span>${s.month === 0 ? "THE FUTURE IS YOURS" : "MONTH " + (s.month + 1)}</span></div></section><section class="card"><div class="card-head"><div><h2>Your businesses <small style="display:inline;margin-left:7px">${s.businesses.length}</small></h2><small>The engines of your growing empire.</small></div><button class="text-btn" data-page="Businesses">Manage businesses ↗</button></div>${
       s.businesses.length
         ? s.businesses
             .slice(0, 4)
@@ -383,6 +407,18 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   let [a, id, mode] = el.dataset.action.split(":");
   let b = s.businesses.find((b) => String(b.id) === id);
+  if (a === "sector") {
+    industryAction(el.dataset.action.split(":"), s, {
+      btn,
+      money,
+      esc,
+      modal,
+      close,
+      changed,
+      toast,
+    });
+    return;
+  }
   if (a === "l") {
     endgameAction(el.dataset.action.split(":"), s, {
       money,
@@ -722,7 +758,17 @@ document.addEventListener("input", (e) => {
 
 function navigation() {
   let groups = [
-    ["OPERATE", ["Businesses", "Operations", "Supply", "Talent", "Contracts"]],
+    [
+      "OPERATE",
+      [
+        "Businesses",
+        "Industries",
+        "Operations",
+        "Supply",
+        "Talent",
+        "Contracts",
+      ],
+    ],
     [
       "EXPAND",
       [

@@ -164,6 +164,13 @@ export function createScenario(id, seed, dynasty) {
     next.empire.corporate.rounds = 1;
   }
   next.startCapital = next.cash - next.debt;
+  next.news = [
+    {
+      title: def.name,
+      text: def.desc + " Starting cash: $" + next.cash.toLocaleString() + ".",
+      month: next.month,
+    },
+  ];
   next.history = [
     { month: next.month, worth: worth(next), cash: next.cash, profit: 0 },
   ];

@@ -44,6 +44,59 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    for (const b of s.businesses || []) {
+      if (!b.sectorState) continue;
+      const q = b.sectorState;
+      if (
+        !obj(q) ||
+        !i(q.policy, 0, 2) ||
+        !n(q.score, 15, 100) ||
+        !i(q.customers) ||
+        !n(q.churn, 0, 0.5) ||
+        !i(q.nextId, 1) ||
+        !txt(q.incident) ||
+        !i(q.spoiled) ||
+        !n(q.pricePressure, 0.65, 1.12) ||
+        !obj(q.upgrades) ||
+        !["process", "service", "resilience"].every((k) =>
+          i(q.upgrades[k], 0, 5),
+        ) ||
+        !arr(
+          q.history,
+          (x) =>
+            obj(x) &&
+            i(x.month) &&
+            n(x.score, 15, 100) &&
+            i(x.customers) &&
+            n(x.churn, 0, 0.5) &&
+            i(x.sold),
+          24,
+        ) ||
+        !arr(
+          q.development,
+          (p) =>
+            obj(p) &&
+            i(p.id, 1) &&
+            txt(p.name) &&
+            i(p.tier, 0, 2) &&
+            i(p.segment, 0, 2) &&
+            ["development", "active"].includes(p.status) &&
+            i(p.remaining, 0, 7) &&
+            i(p.age) &&
+            n(p.appeal, 0.18, 1) &&
+            n(p.invested),
+          8,
+        )
+      )
+        return false;
+      if (
+        new Set(q.development.map((p) => p.id)).size !== q.development.length ||
+        q.development.some((p) => p.id >= q.nextId) ||
+        q.development.filter((p) => p.status === "development").length > 2
+      )
+        return false;
+    }
+
     if (s.empire) {
       let e = s.empire,
         c = e.corporate;

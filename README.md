@@ -4,7 +4,7 @@ A free, single-player financial sandbox for the browser. Start with a small busi
 
 ## Play
 
-The public static release is published using GitHub Pages. No login, subscription, real-money transactions, paid API, or backend is required. Everything runs in the browser.
+Play at **https://dtsg02.github.io/fido-financial-world/**. The public static release is published using GitHub Pages. No login, subscription, real-money transactions, paid API, or backend is required. Everything runs in the browser.
 
 The game automatically saves locally after each action. Each browser/device has its own save. Use **Settings & saves → Export save / Import save** to move progress. Do not clear browser data without a backup.
 
@@ -21,6 +21,8 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 ### Build and operate
 
 - **24 industries:** cafés, creative services, e-commerce, software, manufacturing, solar, bakeries, restaurants, farming, logistics, hotels, clinics, education, publishing, construction, semiconductors, data centers, recycling, biotech, consulting, telecom, games, cybersecurity, and water utilities.
+- **Eight operating models:** subscriptions and churn, hospitality service quality, industrial yield and wear, crop cycles and soil fertility, client trust, accreditation, infrastructure reliability, and retail loyalty. Each has three operating policies and three five-level specialist capabilities.
+- **Product portfolios:** up to eight products per company, two concurrent development projects, three investment tiers, three audience segments, timed launches, support costs, cannibalization, aging, refreshes, and retirement. Rival pricing responds to undercutting and profitable expansion.
 - Pricing elasticity, industry seasonality, macroeconomic exposure, staffing, wages, product quality, marketing, reputation, loyalty, customer segments, and compliance.
 - Employee morale, skill development, resignations, hiring/severance costs, and six specialist executive roles.
 - Direct suppliers or a shared raw-material warehouse; spot and guaranteed supply policies, shipping delays, freight, storage, spoilage, and cross-industry cost savings.
@@ -64,11 +66,12 @@ This is a fictional single-player simulation, not a model of real financial mark
 - Bank customer deposits are liabilities on the bank’s segregated balance sheet, not spendable group capital. Bank earnings enter the group result; transferring equity between bank and group does not create wealth.
 - Some journals summarize profit rather than logging every cash movement. Cash flow can differ from reported net profit.
 - Emergency credit prevents a forced game over. This is an open-ended sandbox; sustained losses increase debt rather than deleting your world.
+- Product development and specialist upgrades are immediate cash investments with no separate resale carrying value or depreciation schedule. Subscription demand includes retained customers plus new acquisitions; only served customers are billed. Crop cycles alter available monthly output. Product bonuses apply to retail sales, not previously agreed contract prices.
 - Startup growth, megaproject returns, currency behavior, and pricing formulas are deliberately fictional game rules.
 
 ## Validation
 
-The suite contains 44 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 54 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -84,6 +87,7 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 - `dist/engine.js`: base monthly simulation and accounting.
 - `dist/world.js`: cities, suppliers, contracts, workforce, and credit.
 - `dist/empire.js`: shared supply, talent, advanced markets, corporate ownership, research, and properties.
+- `dist/sectors.js`, `industry-ui.js`: industry operating models, recurring customers, product lifecycle, policies, and specialist upgrades.
 - `dist/late.js`: international economics, megaprojects, ventures, bank, headquarters, and dynasty.
 - `dist/app.js`, `strategy.js`, `expansion.js`, `endgame.js`: interface and game actions.
 - `dist/validation.js`, `advanced-validation.js`: imported-save validation.

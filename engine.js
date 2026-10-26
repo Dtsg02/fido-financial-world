@@ -1,3 +1,9 @@
+import {
+  sectorEffects,
+  sectorDemand,
+  beforeSectorMonth,
+  afterSectorBusiness,
+} from "./sectors.js";
 import { validateAdvanced } from "./advanced-validation.js";
 import {
   ensureLate,
@@ -186,13 +192,15 @@ export function forecast(s, b) {
   initBusiness(b);
   let t = type(b),
     c = city(b);
+  const sector = sectorEffects(s, b);
   let capacity = Math.floor(
     t.capacity *
       b.staff *
       (1 + 0.15 * s.tech.automation) *
       productivity(b) *
       deepCapacity(s) *
-      adminMultiplier(s),
+      adminMultiplier(s) *
+      sector.capacity,
   );
   let demand = Math.floor(
     t.demand *
@@ -207,8 +215,10 @@ export function forecast(s, b) {
       (1 + (b.quality - 1) * 0.13) *
       demandFactor(s, b) *
       customerMultiplier(s, b) *
-      internationalDemand(s, b),
+      internationalDemand(s, b) *
+      sector.demand,
   );
+  demand = sectorDemand(b, demand);
   let units = Math.min(capacity, demand);
   let unit =
     t.unit *
@@ -217,11 +227,14 @@ export function forecast(s, b) {
     (1 + (b.quality - 1) * 0.15) *
     materialFactor(s, b) *
     deepMaterial(s, b) *
-    internationalMaterial(s, b);
-  let revenue = units * b.price;
+    internationalMaterial(s, b) *
+    sector.unit;
+  const salePrice = b.price * sector.price;
+  let revenue = units * salePrice;
   let overhead =
     b.staff * t.wage * s.inflation * c.wages * b.salary * fxFactor(s, b) +
     t.rent * b.level * s.inflation * c.rent * fxFactor(s, b) +
+    sector.overhead +
     b.marketing +
     companyOverhead(s, b) +
     b.compliance +
@@ -229,6 +242,7 @@ export function forecast(s, b) {
     (completed(s, "ocean") ? s.world.policy.carbon * 0.5 : 0);
   let expense = units * unit + overhead;
   return {
+    salePrice,
     capacity,
     demand,
     units,
@@ -249,6 +263,7 @@ export function advance(s) {
   beforeMonth(s);
   beforeEmpireMonth(s);
   beforeLateMonth(s);
+  beforeSectorMonth(s, rand);
   let revenue = 0,
     operating = 0;
   let details = [];
@@ -279,11 +294,11 @@ export function advance(s) {
       b.inventory,
     );
     b.inventory -= sold;
-    let sales = sold * b.price + contract.revenue;
+    let sales = sold * f.salePrice + contract.revenue;
     let overhead = f.overhead;
     let subsidy = b.type === "energy" ? s.world.policy.subsidy * b.level : 0;
     let profit = sales - (sold + contract.units) * f.unit - overhead + subsidy;
-    s.cash += sold * b.price - overhead + subsidy;
+    s.cash += sold * f.salePrice - overhead + subsidy;
     b.lastRevenue = sales;
     b.lastProfit = profit;
     b.sold = sold;
@@ -295,6 +310,7 @@ export function advance(s) {
         b.reputation + (sold >= demand ? 2 : -1) + (b.quality - 1) * 0.5,
       ),
     );
+    afterSectorBusiness(s, b, demand, sold);
     revenue += sales;
     operating += profit;
     details.push(b.name + ": " + Math.round(profit));
