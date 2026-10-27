@@ -1,10 +1,33 @@
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=5183cae63dc0";
+import {
+  generateDecision,
+  beforeDecisionMonth,
+  decisionModifiers,
+  resolveDecision,
+} from "./decisions.js?v=5183cae63dc0";
+import {
+  facility,
+  facilityAssets,
+  facilityLimits,
+  facilityOverhead,
+  beforeFacilityMonth,
+  enforceStorage,
+} from "./facilities.js?v=5183cae63dc0";
+import {
+  commerce,
+  commercialAssets,
+  beginCommerceMonth,
+  beforeCommerceMonth,
+  procureSupply,
+  routeProduction,
+} from "./commerce.js?v=5183cae63dc0";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=20261026-industry";
-import { validateAdvanced } from "./advanced-validation.js?v=20261026-industry";
+} from "./sectors.js?v=5183cae63dc0";
+import { validateAdvanced } from "./advanced-validation.js?v=5183cae63dc0";
 import {
   ensureLate,
   internationalDemand,
@@ -14,7 +37,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=20261026-industry";
+} from "./late.js?v=5183cae63dc0";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -27,8 +50,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=20261026-industry";
-import { validateExtra } from "./validation.js?v=20261026-industry";
+} from "./empire.js?v=5183cae63dc0";
+import { validateExtra } from "./validation.js?v=5183cae63dc0";
 import {
   ensureWorld,
   initBusiness,
@@ -40,8 +63,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=20261026-industry";
-import { TYPES } from "./catalog.js?v=20261026-industry";
+} from "./world.js?v=5183cae63dc0";
+import { TYPES } from "./catalog.js?v=5183cae63dc0";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
@@ -117,11 +140,17 @@ export function type(b) {
 export function worth(s) {
   return (
     s.cash -
-    s.debt +
+    s.debt -
+    bondDebt(s) +
     additionalAssets(s) +
     lateAssets(s) +
+    commercialAssets(s) +
     s.businesses.reduce(
-      (v, b) => v + type(b).cost * b.level * 0.75 + b.inventory * type(b).unit,
+      (v, b) =>
+        v +
+        type(b).cost * b.level * 0.75 +
+        b.inventory * type(b).unit +
+        facilityAssets(b),
       0,
     ) +
     (s.world?.receivables || []).reduce((n, r) => n + r.amount, 0) +
@@ -193,6 +222,7 @@ export function forecast(s, b) {
   let t = type(b),
     c = city(b);
   const sector = sectorEffects(s, b);
+  const decision = decisionModifiers(s, b);
   let capacity = Math.floor(
     t.capacity *
       b.staff *
@@ -200,8 +230,11 @@ export function forecast(s, b) {
       productivity(b) *
       deepCapacity(s) *
       adminMultiplier(s) *
-      sector.capacity,
+      sector.capacity *
+      decision.capacity,
   );
+  const facilityPlan = facilityLimits(b, capacity);
+  capacity = facilityPlan.capacity;
   let demand = Math.floor(
     t.demand *
       s.economy *
@@ -216,7 +249,8 @@ export function forecast(s, b) {
       demandFactor(s, b) *
       customerMultiplier(s, b) *
       internationalDemand(s, b) *
-      sector.demand,
+      sector.demand *
+      decision.demand,
   );
   demand = sectorDemand(b, demand);
   let units = Math.min(capacity, demand);
@@ -234,6 +268,7 @@ export function forecast(s, b) {
   let overhead =
     b.staff * t.wage * s.inflation * c.wages * b.salary * fxFactor(s, b) +
     t.rent * b.level * s.inflation * c.rent * fxFactor(s, b) +
+    facilityOverhead(s, b) +
     sector.overhead +
     b.marketing +
     companyOverhead(s, b) +
@@ -242,6 +277,7 @@ export function forecast(s, b) {
     (completed(s, "ocean") ? s.world.policy.carbon * 0.5 : 0);
   let expense = units * unit + overhead;
   return {
+    facilityPlan,
     salePrice,
     capacity,
     demand,
@@ -260,10 +296,15 @@ export function advance(s) {
   s.economy = Math.max(0.65, Math.min(1.4, 1 + cycle + (rand(s) - 0.5) * 0.12));
   s.inflation *= 1.002;
   s.rate = Math.max(0.04, Math.min(0.14, 0.08 + (s.economy - 1) * 0.1));
+  beginCommerceMonth(s);
   beforeMonth(s);
+  beforeCommerceMonth(s);
+  beforeBondMonth(s, worth(s));
   beforeEmpireMonth(s);
   beforeLateMonth(s);
   beforeSectorMonth(s, rand);
+  beforeFacilityMonth(s, rand);
+  beforeDecisionMonth(s, rand);
   let revenue = 0,
     operating = 0;
   let details = [];
@@ -275,8 +316,11 @@ export function advance(s) {
     let contractNeed = s.world.contracts
       .filter((c) => c.businessId === b.id && c.status === "active")
       .reduce((n, c) => n + c.units - c.delivered, 0);
-    let target = Math.min(demand + contractNeed, capacity);
-    if (b.auto) {
+    const routeNeed =
+      commerce(s).routes.find((r) => r.from === b.id && r.enabled)?.units || 0;
+    let target = Math.min(demand + contractNeed + routeNeed, capacity);
+    const agreement = procureSupply(s, b, f.unit, rand);
+    if (b.auto && agreement.fallback) {
       let buy = Math.max(0, target - b.inventory);
       let warehouse = warehouseProduction(s, b, buy, f.unit);
       b.inventory += warehouse.units;
@@ -287,13 +331,23 @@ export function advance(s) {
       s.cash -= buy * f.unit;
       b.inventory += buy;
     }
+    commerce(s).expense += enforceStorage(b, f.unit);
     let contract = fulfill(s, b, capacity);
+    const routed = routeProduction(
+      s,
+      b,
+      Math.max(0, capacity - contract.units),
+      f.unit,
+    );
     let sold = Math.min(
       demand,
-      Math.max(0, capacity - contract.units),
+      Math.max(0, capacity - contract.units - routed),
       b.inventory,
     );
     b.inventory -= sold;
+    facility(b).lastUtilization = capacity
+      ? Math.min(1, (sold + contract.units + routed) / capacity)
+      : 0;
     let sales = sold * f.salePrice + contract.revenue;
     let overhead = f.overhead;
     let subsidy = b.type === "energy" ? s.world.policy.subsidy * b.level : 0;
@@ -315,6 +369,7 @@ export function advance(s) {
     operating += profit;
     details.push(b.name + ": " + Math.round(profit));
   }
+  operating -= commerce(s).expense + bondMarket(s).expense;
   let dividend = 0;
   s.prices = s.prices.map((p, i) => {
     let a = ASSETS[i];
@@ -366,6 +421,12 @@ export function advance(s) {
   afterEmpireMonth(s);
   s.profit -= s.empire.monthExpense - beforeCosts;
   log(s, "Month closed: operating profit", operating);
+  if (commerce(s).expense)
+    log(
+      s,
+      "Trade price adjustments, credit losses and stock write-offs",
+      -commerce(s).expense,
+    );
   log(s, "Portfolio income and rent", dividend + rent);
   log(s, "Tax, interest and living costs", -interest - tax - living);
   if (s.cash < 0) {
@@ -417,7 +478,10 @@ export function advance(s) {
         kind: "repair",
       },
     ];
-    s.event = events[Math.floor(rand(s) * events.length)];
+    if (!s.event)
+      s.event =
+        generateDecision(s, rand) ||
+        events[Math.floor(rand(s) * events.length)];
   }
   let checks = [
     ["founder", s.businesses.length >= 1],
@@ -444,6 +508,7 @@ export function advance(s) {
 export function resolve(s, accept) {
   let e = s.event;
   if (!e) return false;
+  if (e.kind === "decision") return resolveDecision(s, accept ? 0 : 2, rand);
   if (accept && s.cash < e.cost) return false;
   if (accept) {
     s.cash -= e.cost;

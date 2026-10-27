@@ -1,5 +1,5 @@
-import { CITIES } from "./world.js?v=20261026-industry";
-import { TYPES } from "./catalog.js?v=20261026-industry";
+import { CITIES } from "./world.js?v=5183cae63dc0";
+import { TYPES } from "./catalog.js?v=5183cae63dc0";
 // Save files are untrusted input. Reject malformed state before replacing a game.
 const finite = (n) => typeof n === "number" && Number.isFinite(n);
 const num = (n, min = 0, max = 1e100) => finite(n) && n >= min && n <= max;
@@ -82,7 +82,7 @@ export function validateExtra(s) {
       return false;
     if (
       s.event &&
-      (!["festival", "training", "repair"].includes(s.event.kind) ||
+      (!["festival", "training", "repair", "decision"].includes(s.event.kind) ||
         !str(s.event.title) ||
         !str(s.event.text) ||
         !num(s.event.cost))

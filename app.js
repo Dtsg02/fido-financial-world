@@ -1,14 +1,19 @@
-import { industryContent, industryAction } from "./industry-ui.js?v=20261026-industry";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=20261026-industry";
-import { ensureLate, lateAssets } from "./late.js?v=20261026-industry";
+import { bondContent, bondAction } from "./bond-ui.js?v=5183cae63dc0";
+import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=5183cae63dc0";
+import { facilityContent, facilityAction } from "./facility-ui.js?v=5183cae63dc0";
+import { facilityAssets } from "./facilities.js?v=5183cae63dc0";
+import { commerceContent, commerceAction } from "./commerce-ui.js?v=5183cae63dc0";
+import { industryContent, industryAction } from "./industry-ui.js?v=5183cae63dc0";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=5183cae63dc0";
+import { ensureLate, lateAssets } from "./late.js?v=5183cae63dc0";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js?v=20261026-industry";
-import { ensureEmpire, additionalAssets } from "./empire.js?v=20261026-industry";
-import { ensureWorld, canSell, city } from "./world.js?v=20261026-industry";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=20261026-industry";
+} from "./expansion.js?v=5183cae63dc0";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=5183cae63dc0";
+import { ensureWorld, canSell, city } from "./world.js?v=5183cae63dc0";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=5183cae63dc0";
 import {
   TYPES,
   ASSETS,
@@ -24,7 +29,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js?v=20261026-industry";
+} from "./engine.js?v=5183cae63dc0";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {
@@ -81,6 +86,11 @@ Object.assign(paths, {
 });
 Object.assign(paths, {
   Industries: "M3 21V9l6 4V7l6 4V3h6v18H3z M7 17h2 M13 17h2",
+  Commerce: "M3 7h18 M3 17h18 M7 3l-4 4 4 4 M17 13l4 4-4 4",
+  Facilities:
+    "M3 21h18 M5 21V7h6V3h8v18 M8 11h2 M8 15h2 M14 7h2 M14 11h2 M14 15h2",
+  Decisions: "M12 3v8 M12 11l-7 7 M12 11l7 7 M2 16v5h5 M17 21h5v-5",
+  Bonds: "M4 3h16v18H4z M8 7h8 M8 11h8 M8 15h3 M15 17l2 2 3-4",
   Supply: "M3 7l9-5 9 5v13H3z M3 7l9 5 9-5 M12 12v10",
   Talent: paths.Competitors,
   Exchange: "M3 7h17l-4-4 M21 17H4l4 4",
@@ -177,6 +187,14 @@ function render() {
     `<aside><div class="brand">fi<span>do.</span></div><div class="brand-sub">FINANCIAL WORLD DOMINATION</div><div class="nav-label">BUILD YOUR EMPIRE</div>${navigation()}<div class="aside-bottom"><button class="nav" data-action="help" title="How to play">${icon("help")}<span>Field guide</span></button><button class="nav ${page === "Settings" ? "active" : ""}" data-page="Settings" title="Settings">${icon("Settings")}<span>Settings & saves</span></button><div class="founder"><div class="avatar">Y</div><div>You, the founder<br><small>${worth(s) >= 1e6 ? "Empire builder" : worth(s) >= 100000 ? "Entrepreneur" : "Aspiring entrepreneur"}</small></div></div></div></aside><div class="shell"><header><div class="breadcrumb">Your workspace &nbsp; / &nbsp; <b>${page}</b></div><div class="top-right"><span class="pill"><span class="dot"></span>Sandbox mode</span><span class="date">◷ &nbsp; ${date()} <span class="muted">· Month ${s.month + 1}</span></span>${btn("Run quarter", "quarter", "light")} ${btn("Next month " + icon("arrow"), "advance")}</div></header><main>${content()}<div class="footer"><span>Small beginnings. Unlimited possibilities.</span><span>Single-player sandbox &nbsp; · &nbsp; Auto-saved locally &nbsp; ●</span></div></main></div>`;
 }
 function content() {
+  if (page === "Bonds")
+    return bondContent(s, { heading, btn, money, esc, stat });
+  if (page === "Decisions")
+    return decisionContent(s, { heading, btn, money, esc });
+  if (page === "Facilities")
+    return facilityContent(s, { heading, btn, money, esc, stat });
+  if (page === "Commerce")
+    return commerceContent(s, { heading, btn, money, esc, stat });
   if (page === "Industries")
     return industryContent(s, { heading, btn, money, esc, stat });
   if (endgamePages.includes(page))
@@ -254,6 +272,7 @@ function overview() {
   );
 }
 function eventCard() {
+  if (s.event.kind === "decision") return decisionCard(s, { btn, money, esc });
   return `<div class="event"><h3>${esc(s.event.title)}</h3><p>${esc(s.event.text)}</p><div class="actions">${btn("Accept · " + money(s.event.cost), "event:yes", "small", s.cash < s.event.cost)}${btn("Pass", "event:no", "small light")}</div></div>`;
 }
 function businesses() {
@@ -407,6 +426,40 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   let [a, id, mode] = el.dataset.action.split(":");
   let b = s.businesses.find((b) => String(b.id) === id);
+  if (a === "bond") {
+    bondAction(el.dataset.action.split(":"), s, {
+      modal,
+      btn,
+      money,
+      close,
+      changed,
+      toast,
+    });
+    return;
+  }
+  if (a === "decision") {
+    if (resolveDecision(s, Number(id))) {
+      close();
+      changed("Decision recorded; follow-up effects are tracked in Decisions.");
+    }
+    return;
+  }
+  if (a === "facility") {
+    facilityAction(el.dataset.action.split(":"), s, { changed, toast });
+    return;
+  }
+  if (a === "commerce") {
+    commerceAction(el.dataset.action.split(":"), s, {
+      btn,
+      money,
+      esc,
+      modal,
+      close,
+      changed,
+      toast,
+    });
+    return;
+  }
   if (a === "sector") {
     industryAction(el.dataset.action.split(":"), s, {
       btn,
@@ -552,15 +605,19 @@ document.addEventListener("click", (e) => {
     }
     case "sellbusiness":
       if (!canSell(s, b))
-        return toast("Complete active contracts before selling this company.");
+        return toast(
+          "Settle supply agreements, invoices, routes, shipments, and active contracts before selling.",
+        );
       modal(
         `<h2>Sell ${esc(b.name)}?</h2><p>This closes the company and ends all its income and expenses. Its staff and operating plan will be removed.</p><div class="actions">${btn("Keep building", "close", "light")}${btn("Sell company", "confirmsell:" + id, "danger")}</div>`,
       );
       break;
     case "confirmsell": {
-      if (!canSell(s, b)) return toast("Complete active contracts first.");
+      if (!canSell(s, b)) return toast("Settle commercial commitments first.");
       let value =
-        type(b).cost * b.level * 0.75 + b.inventory * forecast(s, b).unit;
+        type(b).cost * b.level * 0.75 +
+        b.inventory * forecast(s, b).unit +
+        facilityAssets(b);
       s.cash += value;
       s.businesses = s.businesses.filter((x) => x !== b);
       log(s, "Sold " + b.name, value);
@@ -717,7 +774,7 @@ document.addEventListener("click", (e) => {
       break;
     case "help":
       modal(
-        `<h2>A founder’s field guide.</h2><p><b>1. Open your first business.</b> Start with the café ($12,000) and keep a cash buffer. A new business starts with one employee and automatic materials purchasing.</p><p><b>2. Find your margins.</b> Set prices, hire staff, and watch forecast demand versus capacity. Higher prices improve margins but reduce demand. Expansion increases staff slots and rent. Hiring or firing costs 35% of a local monthly base wage per employee.</p><p><b>3. Advance a month.</b> Businesses trade, staff get paid, investments move, and events unfold. Personal living costs start at $650/month. Tax starts at 20% and changes with government policy.</p><p><b>4. Grow your empire.</b> Research improves all businesses. Buy stocks for dividends, properties for rent, or borrow to expand. Cash shortages trigger emergency debt. There is no forced game over.</p><p><b>5. Build a real operation.</b> Operations controls wages, training, suppliers, maintenance, insurance, city, and multi-month product projects. Contracts reserve capacity and pay invoices later. World shows commodity costs and policy. Competitors can be acquired. Treasury offers fixed-rate amortizing loans.</p><p><b>6. Build the group.</b> Supply manages raw-material shipments and shared warehouses. Talent hires executives. Ownership handles funding rounds, IPOs, dividends, and buybacks. Innovation unlocks technologies. Trading adds limit orders, shorts, and options. Exchange manages foreign reserves. Development upgrades properties.</p><p><b>7. Plan ahead.</b> Planner explains demand drivers, tests operating changes, and simulates 30 possible twelve-month futures without changing your save. Milestones reward different playstyles.</p><p><b>8. Build a legacy.</b> International unlocks 13 cities across five regions. Megaprojects create lasting infrastructure through four funded stages. Ventures backs independent startups. Bank lets you operate a separately capitalized lender. Headquarters manages organizational scale. Dynasty carries prestige advantages across generations.</p><p><b>9. Play your way.</b> Chase $1 million, build a chain of cafés, or become a property investor. Save backups in Settings. All markets and money are fictional.</p><div class="actions">${btn("Let’s build", "close")}</div>`,
+        `<h2>A founder’s field guide.</h2><p><b>1. Open your first business.</b> Start with the café ($12,000) and keep a cash buffer. A new business starts with one employee and automatic materials purchasing.</p><p><b>2. Find your margins.</b> Set prices, hire staff, and watch forecast demand versus capacity. Higher prices improve margins but reduce demand. Expansion increases staff slots and rent. Hiring or firing costs 35% of a local monthly base wage per employee.</p><p><b>3. Advance a month.</b> Businesses trade, staff get paid, investments move, and events unfold. Personal living costs start at $650/month. Tax starts at 20% and changes with government policy.</p><p><b>4. Grow your empire.</b> Research improves all businesses. Buy stocks for dividends, properties for rent, or borrow to expand. Cash shortages trigger emergency debt. There is no forced game over.</p><p><b>5. Build a real operation.</b> Operations controls wages, training, suppliers, maintenance, insurance, city, and multi-month product projects. Contracts reserve capacity and pay invoices later. World shows commodity costs and policy. Competitors can be acquired. Treasury offers fixed-rate amortizing loans.</p><p><b>6. Build the group.</b> Supply manages raw-material shipments and shared warehouses. Talent hires executives. Ownership handles funding rounds, IPOs, dividends, and buybacks. Innovation unlocks technologies. Trading adds limit orders, shorts, and options. Exchange manages foreign reserves. Development upgrades properties.</p><p><b>7. Plan ahead.</b> Planner explains demand drivers, tests operating changes, and simulates 30 possible twelve-month futures without changing your save. Milestones reward different playstyles.</p><p><b>8. Build a legacy.</b> International unlocks 13 cities across five regions. Megaprojects create lasting infrastructure through four funded stages. Ventures backs independent startups. Bank lets you operate a separately capitalized lender. Headquarters manages organizational scale. Dynasty carries prestige advantages across generations.</p><p><b>9. Connect the real constraints.</b> Industries manages operating models and product portfolios. Commerce negotiates supply, trade credit, internal production routes, and customer risk. Facilities separates workforce, equipment, utilities, and storage; construction needs time and cash installments. Decisions tracks the lasting effects of quarterly choices. Bonds offers late-game corporate funding with covenants, maturities, and ownership dilution in distress.</p><p><b>10. Play your way.</b> Chase $1 million, build a chain of cafés, or become a property investor. Save backups in Settings. All markets and money are fictional.</p><div class="actions">${btn("Let’s build", "close")}</div>`,
       );
       break;
   }
@@ -763,6 +820,9 @@ function navigation() {
       [
         "Businesses",
         "Industries",
+        "Commerce",
+        "Facilities",
+        "Decisions",
         "Operations",
         "Supply",
         "Talent",
@@ -782,7 +842,15 @@ function navigation() {
     ],
     [
       "CAPITAL",
-      ["Markets", "Trading", "Exchange", "Banking", "Treasury", "Ownership"],
+      [
+        "Markets",
+        "Trading",
+        "Exchange",
+        "Banking",
+        "Treasury",
+        "Bonds",
+        "Ownership",
+      ],
     ],
     [
       "STRATEGY",

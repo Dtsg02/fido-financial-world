@@ -1,4 +1,4 @@
-import { TYPES } from "./catalog.js?v=20261026-industry";
+import { TYPES } from "./catalog.js?v=5183cae63dc0";
 // Every industry uses one operating model, with persistent state and explicit tradeoffs.
 export const MODELS = {
   subscription: {

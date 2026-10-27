@@ -1,4 +1,6 @@
-import { TYPES, INDUSTRY } from "./catalog.js?v=20261026-industry";
+import { facility } from "./facilities.js?v=5183cae63dc0";
+import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=5183cae63dc0";
+import { TYPES, INDUSTRY } from "./catalog.js?v=5183cae63dc0";
 // Interconnected strategy systems. All randomness uses the save's seeded generator.
 export const CITIES = [
   {
@@ -348,14 +350,7 @@ export function beforeMonth(s) {
     );
     r.value *= 1 + (rng(s) - 0.4) * 0.05;
   }
-  for (let inv of w.receivables.filter((x) => x.due <= s.month)) {
-    s.cash += inv.amount;
-    w.reports.unshift({
-      month: s.month,
-      text: `${inv.client} paid an invoice of $${Math.round(inv.amount).toLocaleString()}.`,
-    });
-  }
-  w.receivables = w.receivables.filter((x) => x.due > s.month);
+  settleCustomers(s, rng);
   for (let bond of w.bonds) {
     let interest = (bond.balance * bond.rate) / 12;
     let principal = Math.min(bond.balance, bond.payment);
@@ -466,6 +461,8 @@ export function fulfill(s, b, capacity) {
     revenue += amount;
     s.world.receivables.push({
       client: c.client,
+      risk: c.creditRisk ?? 0,
+      late: 0,
       amount,
       due: s.month + c.terms,
     });
@@ -537,7 +534,15 @@ export function acceptContract(s, offerId, businessId) {
   )
     return false;
   s.cash -= c.deposit;
-  s.world.contracts.push({ ...c, businessId, status: "active", delivered: 0 });
+  const credit = invoicePolicy(s);
+  s.world.contracts.push({
+    ...c,
+    price: c.price * credit.price,
+    creditRisk: credit.risk,
+    businessId,
+    status: "active",
+    delivered: 0,
+  });
   s.world.offers = s.world.offers.filter((x) => x !== c);
   return true;
 }
@@ -557,8 +562,13 @@ export function launchProject(s, b, id) {
   return true;
 }
 export function canSell(s, b) {
-  return !s.world.contracts.some(
-    (c) => c.businessId === b.id && c.status === "active",
+  return (
+    s.event?.businessId !== b.id &&
+    !facility(b).projects.length &&
+    !commercialBlock(s, b) &&
+    !s.world.contracts.some(
+      (c) => c.businessId === b.id && c.status === "active",
+    )
   );
 }
 export function financeLoan(s, amount, term) {

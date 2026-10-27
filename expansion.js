@@ -7,8 +7,8 @@ import {
   advance,
   resolve,
   log,
-} from "./engine.js?v=20261026-industry";
-import { INDUSTRY } from "./catalog.js?v=20261026-industry";
+} from "./engine.js?v=5183cae63dc0";
+import { INDUSTRY } from "./catalog.js?v=5183cae63dc0";
 import {
   COMMODITIES,
   CITIES,
@@ -16,7 +16,7 @@ import {
   productivity,
   materialFactor,
   demandFactor,
-} from "./world.js?v=20261026-industry";
+} from "./world.js?v=5183cae63dc0";
 import {
   ROLES,
   FX,
@@ -46,7 +46,7 @@ import {
   customerMultiplier,
   deepMaterial,
   deepCapacity,
-} from "./empire.js?v=20261026-industry";
+} from "./empire.js?v=5183cae63dc0";
 export const expansionPages = [
   "Supply",
   "Talent",

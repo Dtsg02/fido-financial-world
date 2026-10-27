@@ -10,6 +10,8 @@ The game automatically saves locally after each action. Each browser/device has 
 
 ## Run locally
 
+For the public release repository (static files at its root), run `python3 -m http.server 4173` and open http://localhost:4173. The following commands apply to the full source workspace.
+
 ```sh
 npm start
 ```
@@ -30,6 +32,15 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - Business-level product/process projects, three basic research tracks, and twelve corporate technologies with prerequisites.
 - B2B contracts, qualification requirements, deposits, capacity priority, deadlines, penalties, invoicing, and deferred payments.
 
+### Commercial operations and facilities
+
+- Four supply houses with different fixed prices, reliability, collateral requirements, and credit terms. Agreements run 6/12/24 months with monthly standing orders, credit limits, delivery suspensions, arrears fees, expiry, and early termination.
+- Internal production routes connect complementary businesses. B2B contracts take capacity first, then internal shipments, then retail sales. Routes consume inventory, charge freight, and arrive next month.
+- Customer underwriting sets the price and payment risk of new B2B contracts. Late invoices enter collection; third missed attempts default with partial recovery. Factoring exchanges future collections for immediate cash at a fee.
+- Six-month commitment calendars separate existing supplier liabilities from future orders and construction installments.
+- Facility equipment, utilities, workforce, and storage create distinct bottlenecks. Four ten-level upgrade tracks have construction periods, staged funding, funding pauses, and salvage values. Shift patterns trade output against payroll, morale, and wear.
+- Fifteen contextual quarterly situations provide 45 choices, with temporary effects and delayed outcomes. Pending decisions are preserved until resolved; recent situations are excluded from the next selection.
+
 ### Expand
 
 - Thirteen cities across five fictional economic regions, regional licenses, import tariffs, trade agreements, political stability, growth, and exchange-rate exposure.
@@ -41,6 +52,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 
 - Five fictional market assets, dividends, limit orders, collateralized short positions, margin checks, and bought cash-settled calls/puts.
 - Four foreign currencies, conversion fees, and reserve holdings.
+- Corporate bonds with 24/60/120-month bullet maturities, credit ratings, issuance limits, cash and leverage covenants, coupon step-ups, capitalized missed interest, distress, early redemption, and debt-for-equity restructuring.
 - Revolving credit, fixed-rate amortizing term loans, credit scores, and automatic emergency credit.
 - Equity rounds, share issuance, founder dilution, IPO eligibility, dividends, and buybacks.
 - Independent startup investments, follow-on funding, runway, dilution, failures, secondary sales, and possible exits.
@@ -64,6 +76,9 @@ This is a fictional single-player simulation, not a model of real financial mark
 - Option premium is expensed from cash when purchased; headline net worth excludes option time value. Options are held to expiry. Limit orders execute at monthly closing prices only. Short losses may exceed opening collateral after a price gap.
 - Procurement cash is paid before sales. Contract invoices can create taxable profit before the cash arrives. Taxes start at 20% of positive modeled taxable income and change with policy; there are no loss carryforwards or comprehensive capital-gains taxes.
 - Bank customer deposits are liabilities on the bank’s segregated balance sheet, not spendable group capital. Bank earnings enter the group result; transferring equity between bank and group does not create wealth.
+- Supply collateral, internal shipments, facility salvage, supplier payables, and corporate bonds enter modeled net worth. Supplier purchase-price differences from modeled material cost are recognized as current-period operating adjustments. Trade-credit principal payments are cash movements, not a second operating expense.
+- Facility construction is carried at 40% of funds paid and completed upgrades at 50% of investment. Internal transfers use 90% of material value plus a 2.5% freight cost, not a physical bill of materials. Factoring fees, cancellation fees, equity swaps, and issuance costs affect cash/net worth when actioned; they are not a comprehensive accrual ledger.
+- Corporate coupons reduce monthly group profit whether paid or capitalized. Bond maturity failures remain corporate liabilities rather than silently turning into bank loans. Restructuring exchanges debt for 20% cash and 80% outside equity, with no claim of a professional valuation model.
 - Some journals summarize profit rather than logging every cash movement. Cash flow can differ from reported net profit.
 - Emergency credit prevents a forced game over. This is an open-ended sandbox; sustained losses increase debt rather than deleting your world.
 - Product development and specialist upgrades are immediate cash investments with no separate resale carrying value or depreciation schedule. Subscription demand includes retained customers plus new acquisitions; only served customers are billed. Crop cycles alter available monthly output. Product bonuses apply to retail sales, not previously agreed contract prices.
@@ -71,7 +86,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 54 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 90 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -84,6 +99,10 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 ## Source structure
 
 - `dist/catalog.js`: industry definitions and sector characteristics.
+- `dist/commerce.js`, `commerce-ui.js`: supply agreements, trade credit, internal production routes, customer risk, factoring, and commitments.
+- `dist/facilities.js`, `facility-ui.js`: physical bottlenecks, construction, shifts, maintenance, and storage.
+- `dist/decisions.js`: contextual choices, temporary effects, and delayed outcomes.
+- `dist/bonds.js`, `bond-ui.js`: corporate debt, covenants, distress, and restructuring.
 - `dist/engine.js`: base monthly simulation and accounting.
 - `dist/world.js`: cities, suppliers, contracts, workforce, and credit.
 - `dist/empire.js`: shared supply, talent, advanced markets, corporate ownership, research, and properties.
@@ -94,3 +113,5 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 - `tests/`: deterministic simulation and integration tests.
 
 Keep private save exports outside the public deployment folder.
+
+Prepare cache-safe static assets with `python3 scripts/prepare-release.py`, then review and push the dedicated `public-release` repository. This preparation command does not publish automatically.

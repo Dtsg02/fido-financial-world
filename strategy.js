@@ -1,5 +1,6 @@
-import { ensureLate, regionFor } from "./late.js?v=20261026-industry";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=20261026-industry";
+import { invoicePolicy } from "./commerce.js?v=5183cae63dc0";
+import { ensureLate, regionFor } from "./late.js?v=5183cae63dc0";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=5183cae63dc0";
 import {
   CITIES,
   SUPPLIERS,
@@ -13,7 +14,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js?v=20261026-industry";
+} from "./world.js?v=5183cae63dc0";
 export const strategyPages = [
   "World",
   "Operations",
@@ -70,11 +71,11 @@ export function strategyContent(page, s, h) {
           let qualified = s.businesses.filter(
             (b) => b.type === o.type && b.reputation >= o.minRep,
           );
-          return `<article class="research"><div class="split"><span class="tag">${TYPES.find((t) => t.id === o.type).sector}</span><small>Due month ${o.deadline + 1}</small></div><h3 style="margin-top:14px">${esc(o.client)}</h3><div class="amount">${money(o.units * o.price)}</div><p>${o.units} units at ${money(o.price)} each. Requires reputation ${o.minRep}. Payment ${o.terms} months after each delivery.</p><p>Deposit ${money(o.deposit)} · Missed deadline penalty ${money(o.penalty)} plus lost deposit.</p>${qualified.length ? `<label class="field">Assign business<select id="contract-${o.id}">${qualified.map((b) => `<option value="${b.id}">${esc(b.name)}</option>`).join("")}</select></label>` : '<p class="negative">No qualifying business in this sector.</p>'}${btn("Sign contract", "s:contract:" + o.id, "small", !qualified.length || s.cash < o.deposit)}</article>`;
+          return `<article class="research"><div class="split"><span class="tag">${TYPES.find((t) => t.id === o.type).sector}</span><small>Due month ${o.deadline + 1}</small></div><h3 style="margin-top:14px">${esc(o.client)}</h3><div class="amount">${money(o.units * o.price * invoicePolicy(s).price)}</div><p>${o.units} units at ${money(o.price * invoicePolicy(s).price)} each. Underwriting payment risk ${(invoicePolicy(s).risk * 100).toFixed(0)}% per due attempt. Requires reputation ${o.minRep}. Payment ${o.terms} months after each delivery.</p><p>Deposit ${money(o.deposit)} · Missed deadline penalty ${money(o.penalty)} plus lost deposit.</p>${qualified.length ? `<label class="field">Assign business<select id="contract-${o.id}">${qualified.map((b) => `<option value="${b.id}">${esc(b.name)}</option>`).join("")}</select></label>` : '<p class="negative">No qualifying business in this sector.</p>'}${btn("Sign contract", "s:contract:" + o.id, "small", !qualified.length || s.cash < o.deposit)}</article>`;
         })
         .join(
           "",
-        )}</div><p class="explain">Contracts get first claim on inventory and capacity, before regular customers. Invoices count as revenue immediately, but the money arrives later. Keep working capital to fund production and wages. A completed contract returns its deposit. Companies with active contracts cannot be sold.</p></section><section class="card" style="margin-top:22px"><h2>Your order book</h2>${w.contracts.map((c) => `<div class="research"><div class="split"><h3>${esc(c.client)} · ${esc(s.businesses.find((b) => b.id === c.businessId)?.name || "Former business")}</h3><span class="tag">${c.status.toUpperCase()}</span></div><div class="progress"><div style="width:${(c.delivered / c.units) * 100}%"></div></div><div class="goal-row"><span>${c.delivered} / ${c.units} units delivered</span><span>Due month ${c.deadline + 1}</span></div></div>`).join("") || '<p class="explain">Your signed contracts will appear here.</p>'}<h3 style="margin-top:22px">Invoice schedule</h3>${w.receivables.map((r) => `<div class="balance-line"><span>${esc(r.client)} · due month ${r.due + 1}</span><b>${money(r.amount)}</b></div>`).join("") || '<p class="explain">No unpaid invoices.</p>'}</section>`
+        )}</div><p class="explain">Contracts get first claim on inventory and capacity, before regular customers. Invoices count as revenue immediately, but the money arrives later and new customers can pay late or default. Prices above include the underwriting policy selected in Commerce. Keep working capital to fund production and wages. A completed contract returns its deposit. Companies with active contracts cannot be sold.</p></section><section class="card" style="margin-top:22px"><h2>Your order book</h2>${w.contracts.map((c) => `<div class="research"><div class="split"><h3>${esc(c.client)} · ${esc(s.businesses.find((b) => b.id === c.businessId)?.name || "Former business")}</h3><span class="tag">${c.status.toUpperCase()}</span></div><div class="progress"><div style="width:${(c.delivered / c.units) * 100}%"></div></div><div class="goal-row"><span>${c.delivered} / ${c.units} units delivered</span><span>Due month ${c.deadline + 1}</span></div></div>`).join("") || '<p class="explain">Your signed contracts will appear here.</p>'}<h3 style="margin-top:22px">Invoice schedule</h3>${w.receivables.map((r) => `<div class="balance-line"><span>${esc(r.client)} · due month ${r.due + 1}</span><b>${money(r.amount)}</b></div>`).join("") || '<p class="explain">No unpaid invoices.</p>'}</section>`
     );
   if (page === "Competitors")
     return (
