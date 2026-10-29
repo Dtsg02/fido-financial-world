@@ -1,5 +1,5 @@
-import { stockValue, warehouseValues } from "./inventory.js?v=14dae22974bb";
-import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=14dae22974bb";
+import { stockValue, warehouseValues } from "./inventory.js?v=50124d33bf5b";
+import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=50124d33bf5b";
 export function purchasing(b) {
   return (b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 });
 }
@@ -101,7 +101,8 @@ export function liquidityDrill(s, collectionRate = 1) {
       r.supplier -
       r.construction -
       r.debtService -
-      r.tax;
+      r.tax -
+      r.integration;
     minimum = Math.min(minimum, cash);
     if (cash < 0 && firstGap === null) firstGap = r.month;
     return { ...r, cash };

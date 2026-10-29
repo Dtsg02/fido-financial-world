@@ -1,6 +1,12 @@
-import { invoicePolicy } from "./commerce.js?v=14dae22974bb";
-import { ensureLate, regionFor } from "./late.js?v=14dae22974bb";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=14dae22974bb";
+import {
+  INTEGRATION_PLANS,
+  acquisitionQuote,
+  recordAcquisition,
+} from "./acquisitions.js?v=50124d33bf5b";
+import { integrationContent } from "./acquisition-ui.js?v=50124d33bf5b";
+import { invoicePolicy } from "./commerce.js?v=50124d33bf5b";
+import { ensureLate, regionFor } from "./late.js?v=50124d33bf5b";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=50124d33bf5b";
 import {
   CITIES,
   SUPPLIERS,
@@ -14,7 +20,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js?v=14dae22974bb";
+} from "./world.js?v=50124d33bf5b";
 export const strategyPages = [
   "World",
   "Operations",
@@ -83,7 +89,8 @@ export function strategyContent(page, s, h) {
         "You’re not the only one with ambition.",
         "Local rivals compete for demand. Acquire them to consolidate your market.",
       ) +
-      `<div class="catalog">${w.rivals.map((r) => `<section class="card"><div class="split"><div class="business-icon">${TYPES.find((t) => t.id === r.type).icon}</div><span class="tag">${CITIES.find((c) => c.id === r.city).name}</span></div><h2>${esc(r.name)}</h2><p>${TYPES.find((t) => t.id === r.type).sector}</p><div class="balance-line"><span>Competitive strength</span><b>${r.power.toFixed(2)}×</b></div><div class="balance-line"><span>Reputation</span><b>${Math.round(r.reputation)} / 100</b></div><div class="balance-line"><span>Indicative price</span><b>${money(r.price)}</b></div><div class="balance-line"><span>Acquisition price</span><b>${money(r.value)}</b></div>${btn("Review acquisition", "s:acquisition:" + r.id, "light", s.cash < r.value)}</section>`).join("")}</div><p class="explain">Rival strength reduces your demand in the same sector and city. Prices, strength, reputation, and valuations evolve monthly. An acquisition adds a level 2 company with 3 employees and removes that rival. The acquired business may still compete with your other companies; integrate its operating plan carefully. Buying above asset resale value creates an immediate net-worth reduction.</p>`
+      `<div class="catalog">${w.rivals.map((r) => `<section class="card"><div class="split"><div class="business-icon">${TYPES.find((t) => t.id === r.type).icon}</div><span class="tag">${CITIES.find((c) => c.id === r.city).name}</span></div><h2>${esc(r.name)}</h2><p>${TYPES.find((t) => t.id === r.type).sector}</p><div class="balance-line"><span>Competitive strength</span><b>${r.power.toFixed(2)}×</b></div><div class="balance-line"><span>Reputation</span><b>${Math.round(r.reputation)} / 100</b></div><div class="balance-line"><span>Indicative price</span><b>${money(r.price)}</b></div><div class="balance-line"><span>Acquisition price</span><b>${money(r.value)}</b></div>${btn("Review acquisition", "s:acquisition:" + r.id, "light", s.cash < r.value * 0.6)}</section>`).join("")}</div><p class="explain">Rival strength reduces your demand in the same sector and city. Prices, strength, reputation, and valuations evolve monthly. An acquisition adds a level 2 company with 3 employees and removes that rival. The acquired business may still compete with your other companies; integrate its operating plan carefully. Buying above asset resale value creates an immediate net-worth reduction.</p>` +
+      integrationContent(s, h)
     );
   if (page === "Treasury") {
     let termDebt = w.bonds.reduce((n, b) => n + b.balance, 0);
@@ -92,7 +99,7 @@ export function strategyContent(page, s, h) {
         "Capital has a cost. Timing matters.",
         "Match long-term investments with financing you can sustain.",
       ) +
-      `<div class="stats">${stat("Credit score", w.creditScore, "Contracts and leverage affect rating", "Achievements")}${stat("Term debt", money(termDebt), "Fixed rates · monthly amortization", "Banking")}${stat("Revolving debt", money(s.debt - termDebt), "Variable interest · repay in Banking", "wallet")}${stat("Receivables", money(w.receivables.reduce((n, r) => n + r.amount, 0)), "Future cash from signed orders", "Markets")}</div><div class="detail-grid"><section class="card"><h2>Finance an expansion</h2><p class="explain">Borrow a term loan at a fixed rate based on today’s base rate and your credit score. Principal is repaid in equal monthly installments, plus interest on the remaining balance. This is separate from your variable-rate credit line.</p><label class="field">Loan amount<input id="termAmount" type="number" min="1000" value="10000" step="1000"></label><label class="field">Repayment term<select id="termMonths"><option value="12">12 months</option><option value="24">24 months</option><option value="36">36 months</option></select></label><div class="balance-line"><span>Fixed annual rate if borrowed now</span><b>${(Math.max(0.04, s.rate + (700 - w.creditScore) / 10000 + 0.01) * 100).toFixed(2)}%</b></div><p class="explain">Available term facility: ${money(Math.max(0, Math.max(25000, s.cash * 0.7) - s.debt))}. Loan repayments reduce cash even when your business is unprofitable.</p><br>${btn("Take term loan", "s:term")}</section><section class="card"><h2>Repayment calendar</h2>${w.bonds.map((b, i) => `<div class="research"><div class="split"><h3>Term facility ${i + 1}</h3><span class="tag">${(b.rate * 100).toFixed(2)}% FIXED</span></div><div class="balance-line"><span>Remaining principal</span><b>${money(b.balance)}</b></div><div class="balance-line"><span>Next principal + interest</span><b>${money(Math.min(b.payment, b.balance) + (b.balance * b.rate) / 12)}</b></div><small>Approximately ${Math.ceil(b.balance / b.payment)} payments remaining</small></div>`).join("") || '<p class="explain">No term loans. Your balance sheet has room to breathe.</p>'}<p class="explain">Unpaid invoices, refundable active deposits, and inventory at base material cost are included in net worth. Debt appears in full. Cash can still run out while your net worth is positive.</p></section></div>`
+      `<div class="stats">${stat("Credit score", w.creditScore, "Contracts and leverage affect rating", "Achievements")}${stat("Term debt", money(termDebt), "Fixed rates · monthly amortization", "Banking")}${stat("Revolving debt", money(s.debt - termDebt), "Variable interest · repay in Banking", "wallet")}${stat("Receivables", money(w.receivables.reduce((n, r) => n + r.amount, 0)), "Future cash from signed orders", "Markets")}</div><div class="detail-grid"><section class="card"><h2>Finance an expansion</h2><p class="explain">Borrow a term loan at a fixed rate based on today’s base rate and your credit score. Principal is repaid in equal monthly installments, plus interest on the remaining balance. This is separate from your variable-rate credit line.</p><label class="field">Loan amount<input id="termAmount" type="number" min="1000" value="10000" step="1000"></label><label class="field">Repayment term<select id="termMonths"><option value="12">12 months</option><option value="24">24 months</option><option value="36">36 months</option></select></label><div class="balance-line"><span>Fixed annual rate if borrowed now</span><b>${(Math.max(0.04, s.rate + (700 - w.creditScore) / 10000 + 0.01) * 100).toFixed(2)}%</b></div><p class="explain">Available term facility: ${money(Math.max(0, Math.max(25000, s.cash * 0.7) - s.debt))}. Loan repayments reduce cash even when your business is unprofitable.</p><br>${btn("Take term loan", "s:term")}</section><section class="card"><h2>Repayment calendar</h2>${w.bonds.map((b, i) => `<div class="research"><div class="split"><h3>Term facility ${i + 1}</h3><span class="tag">${(b.rate * 100).toFixed(2)}% FIXED</span></div><div class="balance-line"><span>Remaining principal</span><b>${money(b.balance)}</b></div><div class="balance-line"><span>Next principal + interest</span><b>${money(Math.min(b.payment, b.balance) + (b.balance * b.rate) / 12)}</b></div><small>Approximately ${Math.ceil(b.balance / b.payment)} payments remaining</small></div>`).join("") || '<p class="explain">No term loans. Your balance sheet has room to breathe.</p>'}<p class="explain">Unpaid invoices, refundable active deposits, and inventory at recorded acquisition cost are included in net worth. Debt appears in full. Cash can still run out while your net worth is positive.</p></section></div>`
     );
   }
   return "";
@@ -169,14 +176,30 @@ export function strategyAction(parts, s, h) {
     }
     case "acquisition": {
       let r = s.world.rivals.find((r) => r.id === id);
+      if (!r) return;
       modal(
-        `<h2>Acquire ${esc(r.name)}?</h2><p>Pay ${money(r.value)} for a level 2 ${TYPES.find((t) => t.id === r.type).name} in ${CITIES.find((c) => c.id === r.city).name}. It comes with three employees, its current reputation, and no inventory. Be ready to fund payroll and materials.</p><div class="actions">${btn("Cancel", "close", "light")}${btn("Complete acquisition", "s:buyrival:" + id)}</div>`,
+        `<h2>Acquire ${esc(r.name)}?</h2><p>Purchase price ${money(r.value)} for a level 2 ${TYPES.find((t) => t.id === r.type).name} in ${CITIES.find((c) => c.id === r.city).name}. It comes with three employees, its current reputation, and no inventory. Be ready to fund payroll and materials.</p><label class="field">Integration approach<select id="deal-plan">${Object.entries(
+          INTEGRATION_PLANS,
+        )
+          .map(
+            ([id, p]) =>
+              `<option value="${id}">${p.name} · ${p.months} months · ${money(r.value * p.cost)}/month</option>`,
+          )
+          .join("")}</select></label>${Object.values(INTEGRATION_PLANS)
+          .map((p) => `<p><b>${p.name}:</b> ${p.desc}</p>`)
+          .join(
+            "",
+          )}<label class="field">Payment structure<select id="deal-financing"><option value="cash">All cash · ${money(r.value)} upfront</option><option value="seller">Seller financing · ${money(r.value * 0.6)} upfront, ${money(r.value * 0.4)} over 12 months at 10% annual interest</option></select></label><div class="actions">${btn("Cancel", "close", "light")}${btn("Complete acquisition", "s:buyrival:" + id)}</div>`,
       );
       break;
     }
     case "buyrival": {
       let r = s.world.rivals.find((r) => r.id === id);
-      if (!r || s.cash < r.value) return toast("Not enough cash.");
+      const plan = document.querySelector("#deal-plan")?.value,
+        financing = document.querySelector("#deal-financing")?.value;
+      const quote = acquisitionQuote(r, plan, financing);
+      if (!quote || s.cash < quote.upfront)
+        return toast("Not enough cash for this payment structure.");
       ensureLate(s);
       if (!regionFor(s, { city: r.city }).access)
         return toast("Open this region in International first.");
@@ -187,7 +210,7 @@ export function strategyAction(parts, s, h) {
         s.cash = originalCash;
         return toast("Acquisition could not be completed.");
       }
-      s.cash = originalCash - r.value;
+      s.cash = originalCash - quote.upfront;
       let acquired = s.businesses.at(-1);
       Object.assign(acquired, {
         city: r.city,
@@ -196,10 +219,13 @@ export function strategyAction(parts, s, h) {
         reputation: r.reputation,
         price: r.price,
       });
+      recordAcquisition(s, acquired, r.value, plan, financing);
       s.world.rivals = s.world.rivals.filter((x) => x !== r);
       log(s, "Acquisition premium: " + r.name, base - r.value);
       close();
-      changed("Acquisition complete. Review the new company’s operating plan.");
+      changed(
+        "Acquisition completed. Integration and any seller financing start next month.",
+      );
       break;
     }
     case "term": {

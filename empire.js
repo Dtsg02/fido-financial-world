@@ -1,7 +1,7 @@
-import { commerce } from "./commerce.js?v=14dae22974bb";
-import { warehouseValues } from "./inventory.js?v=14dae22974bb";
-import { TYPES, INDUSTRY } from "./catalog.js?v=14dae22974bb";
-import { rng, ensureWorld, city, supplier, report } from "./world.js?v=14dae22974bb";
+import { commerce } from "./commerce.js?v=50124d33bf5b";
+import { warehouseValues } from "./inventory.js?v=50124d33bf5b";
+import { TYPES, INDUSTRY } from "./catalog.js?v=50124d33bf5b";
+import { rng, ensureWorld, city, supplier, report } from "./world.js?v=50124d33bf5b";
 export const ROLES = [
   {
     id: "coo",

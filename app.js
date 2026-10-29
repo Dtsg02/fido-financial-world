@@ -1,21 +1,32 @@
-import { accountsContent, accountsAction } from "./accounts-ui.js?v=14dae22974bb";
-import { stockValue, receiveStock } from "./inventory.js?v=14dae22974bb";
-import { bondContent, bondAction } from "./bond-ui.js?v=14dae22974bb";
-import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=14dae22974bb";
-import { facilityContent, facilityAction } from "./facility-ui.js?v=14dae22974bb";
-import { facilityAssets } from "./facilities.js?v=14dae22974bb";
-import { commerceContent, commerceAction } from "./commerce-ui.js?v=14dae22974bb";
-import { industryContent, industryAction } from "./industry-ui.js?v=14dae22974bb";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=14dae22974bb";
-import { ensureLate, lateAssets } from "./late.js?v=14dae22974bb";
+import {
+  plannedStaff,
+  staffingQuote,
+  setStaffing,
+  hiringControls,
+} from "./workforce.js?v=50124d33bf5b";
+import { sellerDebt } from "./acquisitions.js?v=50124d33bf5b";
+import { taxLiability } from "./tax.js?v=50124d33bf5b";
+import { bondDebt } from "./bonds.js?v=50124d33bf5b";
+import { commercialAssets } from "./commerce.js?v=50124d33bf5b";
+import { integrationAction } from "./acquisition-ui.js?v=50124d33bf5b";
+import { accountsContent, accountsAction } from "./accounts-ui.js?v=50124d33bf5b";
+import { stockValue, receiveStock } from "./inventory.js?v=50124d33bf5b";
+import { bondContent, bondAction } from "./bond-ui.js?v=50124d33bf5b";
+import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=50124d33bf5b";
+import { facilityContent, facilityAction } from "./facility-ui.js?v=50124d33bf5b";
+import { facilityAssets } from "./facilities.js?v=50124d33bf5b";
+import { commerceContent, commerceAction } from "./commerce-ui.js?v=50124d33bf5b";
+import { industryContent, industryAction } from "./industry-ui.js?v=50124d33bf5b";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=50124d33bf5b";
+import { ensureLate, lateAssets } from "./late.js?v=50124d33bf5b";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js?v=14dae22974bb";
-import { ensureEmpire, additionalAssets } from "./empire.js?v=14dae22974bb";
-import { ensureWorld, canSell, city } from "./world.js?v=14dae22974bb";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=14dae22974bb";
+} from "./expansion.js?v=50124d33bf5b";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=50124d33bf5b";
+import { ensureWorld, canSell, city } from "./world.js?v=50124d33bf5b";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=50124d33bf5b";
 import {
   TYPES,
   ASSETS,
@@ -31,7 +42,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js?v=14dae22974bb";
+} from "./engine.js?v=50124d33bf5b";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {
@@ -301,7 +312,7 @@ function manage(b) {
       "Adjust the details. Build a better business.",
       btn("← All businesses", "allbusiness", "light"),
     ) +
-    `<div class="stats">${stat("Revenue / last month", money(b.lastRevenue), b.sold + " units sold", "Markets")}${stat("Operating profit", money(b.lastProfit), "Before personal taxes & interest", "wallet")}${stat("Reputation", Math.round(b.reputation) + "/100", "Fulfill demand to earn loyalty", "Achievements")}${stat("Demand / capacity", f.demand + " / " + f.capacity, "Estimated units this month", "Businesses")}</div><div class="detail-grid"><section class="card"><h2>The operating desk</h2><label class="field">Price per unit · baseline ${money(t.price)}<input id="price" type="number" min="${t.price * 0.25}" max="${t.price * 4}" step="0.01" value="${b.price}"></label><label class="field">Team size · ${money(t.wage * s.inflation * city(b).wages * b.salary)} per employee / month<input id="staff" type="number" min="1" max="${b.level * 5}" value="${b.staff}"></label><label class="field">Monthly marketing budget<input id="marketing" type="number" min="0" max="100000" step="100" value="${b.marketing}"></label><label class="field">Product quality<select id="quality">${[1, 2, 3].map((n) => `<option value="${n}" ${b.quality === n ? "selected" : ""}>${["Standard", "Premium (+15% material costs)", "Exceptional (+30% material costs)"][n - 1]}</option>`).join("")}</select></label>${btn("Save operating plan", "plan:" + b.id)}<p class="explain">Demand responds to price, reputation, marketing, the economy, and research. Premium quality raises demand and reputation but costs more to produce. Hiring or firing costs 35% of a local base monthly wage per employee. Rent: ${money(t.rent * b.level * s.inflation * city(b).rent)}/month. Manage morale, suppliers, and projects in Operations.</p></section><div class="stack"><section class="card"><h2>Next month’s outlook</h2><div class="balance-line"><span>Estimated sales</span><b>${money(f.revenue)}</b></div><div class="balance-line"><span>Materials, wages, rent & marketing</span><b>−${money(f.expense)}</b></div><div class="balance-line total"><span>Operating profit</span><b class="${f.profit >= 0 ? "positive" : "negative"}">${money(f.profit)}</b></div><p class="explain">An estimate, not a guarantee. Demand varies ±15%. ${b.lost ? b.lost + " customers were unserved last month." : ""} Cash is needed to buy materials before sales arrive.</p></section><section class="card"><h2>Inventory & growth</h2><div class="balance-line"><span>Materials in stock</span><b>${b.inventory} units</b></div><label class="field">Purchasing policy<select id="auto" data-business="${b.id}"><option value="yes" ${b.auto ? "selected" : ""}>Automatic · buy for monthly demand</option><option value="no" ${!b.auto ? "selected" : ""}>Manual · use existing inventory only</option></select></label><div class="actions">${btn("Buy 100 units · " + money(f.unit * 100), "stock:" + b.id, "light", s.cash < f.unit * 100)}${btn("Expand · " + money(exp), "expand:" + b.id, "", s.cash < exp || b.level >= 10)}</div><p class="explain">Expansion unlocks 5 more employee slots. It also raises rent; hire staff to use the new capacity. Maximum level 10.</p></section><section class="card"><h2>Exit strategy</h2><p class="explain">Sell the company for ${money(t.cost * b.level * 0.75)} plus inventory at its recorded acquisition cost. This ends its income and expenses.</p><br>${btn("Sell business", "sellbusiness:" + b.id, "danger")}</section></div></div>`
+    `<div class="stats">${stat("Revenue / last month", money(b.lastRevenue), b.sold + " units sold", "Markets")}${stat("Operating profit", money(b.lastProfit), "Before personal taxes & interest", "wallet")}${stat("Reputation", Math.round(b.reputation) + "/100", "Fulfill demand to earn loyalty", "Achievements")}${stat("Demand / capacity", f.demand + " / " + f.capacity, "Estimated units this month", "Businesses")}</div><div class="detail-grid"><section class="card"><h2>The operating desk</h2><label class="field">Price per unit · baseline ${money(t.price)}<input id="price" type="number" min="${t.price * 0.25}" max="${t.price * 4}" step="0.01" value="${b.price}"></label><label class="field">Target team size · ${money(t.wage * s.inflation * city(b).wages * b.salary)} per employee / month<input id="staff" type="number" min="1" max="${b.level * 5}" value="${plannedStaff(b)}"></label>${hiringControls(b, esc)}<label class="field">Monthly marketing budget<input id="marketing" type="number" min="0" max="100000" step="100" value="${b.marketing}"></label><label class="field">Product quality<select id="quality">${[1, 2, 3].map((n) => `<option value="${n}" ${b.quality === n ? "selected" : ""}>${["Standard", "Premium (+15% material costs)", "Exceptional (+30% material costs)"][n - 1]}</option>`).join("")}</select></label>${btn("Save operating plan", "plan:" + b.id)}<p class="explain">Demand responds to price, reputation, marketing, the economy, and research. Premium quality raises demand and reputation but costs more to produce. Recruitment takes 1–3 months before candidate acceptance and onboarding. Fees depend on channel; severance costs 35% of a local base monthly wage per employee. Rent: ${money(t.rent * b.level * s.inflation * city(b).rent)}/month. Manage morale, suppliers, and projects in Operations.</p></section><div class="stack"><section class="card"><h2>Next month’s outlook</h2><div class="balance-line"><span>Estimated sales</span><b>${money(f.revenue)}</b></div><div class="balance-line"><span>Materials, wages, rent & marketing</span><b>−${money(f.expense)}</b></div><div class="balance-line total"><span>Operating profit</span><b class="${f.profit >= 0 ? "positive" : "negative"}">${money(f.profit)}</b></div><p class="explain">An estimate, not a guarantee. Demand varies ±15%. ${b.lost ? b.lost + " customers were unserved last month." : ""} Cash is needed to buy materials before sales arrive.</p></section><section class="card"><h2>Inventory & growth</h2><div class="balance-line"><span>Materials in stock</span><b>${b.inventory} units</b></div><label class="field">Purchasing policy<select id="auto" data-business="${b.id}"><option value="yes" ${b.auto ? "selected" : ""}>Automatic · buy for monthly demand</option><option value="no" ${!b.auto ? "selected" : ""}>Manual · use existing inventory only</option></select></label><div class="actions">${btn("Buy 100 units · " + money(f.unit * 100), "stock:" + b.id, "light", s.cash < f.unit * 100)}${btn("Expand · " + money(exp), "expand:" + b.id, "", s.cash < exp || b.level >= 10)}</div><p class="explain">Expansion unlocks 5 more employee slots. It also raises rent; hire staff to use the new capacity. Maximum level 10.</p></section><section class="card"><h2>Exit strategy</h2><p class="explain">Sell the company for ${money(t.cost * b.level * 0.75)} plus inventory at its recorded acquisition cost. This ends its income and expenses.</p><br>${btn("Sell business", "sellbusiness:" + b.id, "danger")}</section></div></div>`
   );
 }
 function catalog() {
@@ -335,7 +346,7 @@ function banking() {
       "Give your ambitions some runway.",
       "Debt can accelerate growth. Interest can slow it down.",
     ) +
-    `<div class="stats">${stat("Cash", money(s.cash), "Your liquid capital", "wallet")}${stat("Outstanding debt", money(s.debt), "Interest charged monthly", "Banking")}${stat("Annual interest rate", (s.rate * 100).toFixed(1) + "%", "Variable, follows the economy", "Markets")}${stat("Available credit", money(available), "Based on current net worth", "Properties")}</div><div class="detail-grid"><section class="card"><h2>Your credit line</h2><p class="explain">Borrow up to the greater of $25,000 or 50% of your net worth, minus existing debt. No fixed repayment schedule. Emergency credit may exceed this limit if cash runs out.</p><label class="field">Amount in dollars<input id="loanAmount" type="number" min="1" step="100" value="5000"></label><div class="actions">${btn("Borrow funds", "borrow", "", available < 1)}${btn("Repay debt", "repay", "light", s.debt <= 0)}</div><p class="explain">Current interest payment: ${money((s.debt * s.rate) / 12)} per month. Unused cash earns no interest.</p></section><section class="card"><h2>Your balance sheet</h2><div class="balance-line"><span>Cash</span><b>${money(s.cash)}</b></div><div class="balance-line"><span>Businesses (resale value)</span><b>${money(s.businesses.reduce((n, b) => n + type(b).cost * b.level * 0.75, 0))}</b></div><div class="balance-line"><span>Stock portfolio</span><b>${money(s.prices.reduce((n, p, i) => n + p * (s.holdings[i] || 0), 0))}</b></div><div class="balance-line"><span>Real estate</span><b>${money(s.properties.reduce((n, p) => n + PROPERTIES[p.kind].cost * p.factor * (1 + ((p.level || 1) - 1) * 0.15), 0))}</b></div><div class="balance-line"><span>Inventory (acquisition cost), deposits & invoices</span><b>${money(s.businesses.reduce((n, b) => n + stockValue(b), 0) + s.world.receivables.reduce((n, r) => n + r.amount, 0) + s.world.contracts.filter((c) => c.status === "active").reduce((n, c) => n + c.deposit, 0))}</b></div><div class="balance-line"><span>Warehouse, shipments, FX & advanced assets</span><b>${money(additionalAssets(s))}</b></div><div class="balance-line"><span>Private ventures, bank equity & infrastructure</span><b>${money(lateAssets(s))}</b></div><div class="balance-line"><span>Debt</span><b>−${money(s.debt)}</b></div><div class="balance-line total"><span>Net worth</span><b>${money(worth(s))}</b></div></section></div>`
+    `<div class="stats">${stat("Cash", money(s.cash), "Your liquid capital", "wallet")}${stat("Outstanding debt", money(s.debt), "Interest charged monthly", "Banking")}${stat("Annual interest rate", (s.rate * 100).toFixed(1) + "%", "Variable, follows the economy", "Markets")}${stat("Available credit", money(available), "Based on current net worth", "Properties")}</div><div class="detail-grid"><section class="card"><h2>Your credit line</h2><p class="explain">Borrow up to the greater of $25,000 or 50% of your net worth, minus existing debt. No fixed repayment schedule. Emergency credit may exceed this limit if cash runs out.</p><label class="field">Amount in dollars<input id="loanAmount" type="number" min="1" step="100" value="5000"></label><div class="actions">${btn("Borrow funds", "borrow", "", available < 1)}${btn("Repay debt", "repay", "light", s.debt <= 0)}</div><p class="explain">Current interest payment: ${money((s.debt * s.rate) / 12)} per month. Unused cash earns no interest.</p></section><section class="card"><h2>Your balance sheet</h2><div class="balance-line"><span>Cash</span><b>${money(s.cash)}</b></div><div class="balance-line"><span>Businesses & facilities (resale value)</span><b>${money(s.businesses.reduce((n, b) => n + type(b).cost * b.level * 0.75 + facilityAssets(b), 0))}</b></div><div class="balance-line"><span>Stock portfolio</span><b>${money(s.prices.reduce((n, p, i) => n + p * (s.holdings[i] || 0), 0))}</b></div><div class="balance-line"><span>Real estate</span><b>${money(s.properties.reduce((n, p) => n + PROPERTIES[p.kind].cost * p.factor * (1 + ((p.level || 1) - 1) * 0.15), 0))}</b></div><div class="balance-line"><span>Inventory (acquisition cost), deposits & invoices</span><b>${money(s.businesses.reduce((n, b) => n + stockValue(b), 0) + s.world.receivables.reduce((n, r) => n + r.amount, 0) + s.world.contracts.filter((c) => c.status === "active").reduce((n, c) => n + c.deposit, 0))}</b></div><div class="balance-line"><span>Warehouse, shipments, FX & advanced assets</span><b>${money(additionalAssets(s))}</b></div><div class="balance-line"><span>Private ventures, bank equity & infrastructure</span><b>${money(lateAssets(s))}</b></div><div class="balance-line"><span>Trade assets less supplier payables</span><b>${money(commercialAssets(s))}</b></div><div class="balance-line"><span>Bank debt</span><b>−${money(s.debt)}</b></div><div class="balance-line"><span>Corporate bonds</span><b>−${money(bondDebt(s))}</b></div><div class="balance-line"><span>Seller financing</span><b>−${money(sellerDebt(s))}</b></div><div class="balance-line"><span>Accrued tax payable</span><b>−${money(taxLiability(s))}</b></div><div class="balance-line total"><span>Net worth</span><b>${money(worth(s))}</b></div></section></div>`
   );
 }
 function research() {
@@ -430,6 +441,16 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   let [a, id, mode] = el.dataset.action.split(":");
   let b = s.businesses.find((b) => String(b.id) === id);
+  if (a === "deal") {
+    integrationAction(el.dataset.action.split(":"), s, {
+      changed,
+      toast,
+      modal,
+      btn,
+      close,
+    });
+    return;
+  }
   if (a === "bond") {
     bondAction(el.dataset.action.split(":"), s, {
       modal,
@@ -579,15 +600,12 @@ document.addEventListener("click", (e) => {
         marketing > 100000
       )
         return toast("Check the price, staffing limits, and marketing budget.");
-      let staffingCost =
-        Math.abs(staff - b.staff) * type(b).wage * 0.35 * city(b).wages;
-      if (s.cash < staffingCost)
-        return toast("Insufficient cash for hiring or severance costs.");
-      if (staffingCost) {
-        s.cash -= staffingCost;
-        log(s, "Hiring / severance: " + b.name, -staffingCost);
-      }
-      Object.assign(b, { price, staff, marketing, quality });
+      const method = $("#recruitment").value,
+        quote = staffingQuote(b, staff, method, city(b).wages);
+      if (!quote || !setStaffing(s, b, staff, method, city(b).wages))
+        return toast("Insufficient cash or invalid staffing target.");
+      if (quote.cost) log(s, "Recruitment / severance: " + b.name, -quote.cost);
+      Object.assign(b, { price, marketing, quality });
       changed("Operating plan saved.");
       break;
     }
@@ -621,7 +639,10 @@ document.addEventListener("click", (e) => {
       );
       break;
     case "confirmsell": {
-      if (!canSell(s, b)) return toast("Settle commercial commitments first.");
+      if (!canSell(s, b))
+        return toast(
+          "Settle contracts, integration plans, and commercial financing first.",
+        );
       let value =
         type(b).cost * b.level * 0.75 + stockValue(b) + facilityAssets(b);
       s.cash += value;
@@ -780,7 +801,7 @@ document.addEventListener("click", (e) => {
       break;
     case "help":
       modal(
-        `<h2>A founder’s field guide.</h2><p><b>1. Open your first business.</b> Start with the café ($12,000) and keep a cash buffer. A new business starts with one employee and automatic materials purchasing.</p><p><b>2. Find your margins.</b> Set prices, hire staff, and watch forecast demand versus capacity. Higher prices improve margins but reduce demand. Expansion increases staff slots and rent. Hiring or firing costs 35% of a local monthly base wage per employee.</p><p><b>3. Advance a month.</b> Businesses trade, staff get paid, investments move, and events unfold. Personal living costs start at $650/month. Tax starts at 20% and changes with government policy.</p><p><b>4. Grow your empire.</b> Research improves all businesses. Buy stocks for dividends, properties for rent, or borrow to expand. Cash shortages trigger emergency debt. There is no forced game over.</p><p><b>5. Build a real operation.</b> Operations controls wages, training, suppliers, maintenance, insurance, city, and multi-month product projects. Contracts reserve capacity and pay invoices later. World shows commodity costs and policy. Competitors can be acquired. Treasury offers fixed-rate amortizing loans.</p><p><b>6. Build the group.</b> Supply manages raw-material shipments and shared warehouses. Talent hires executives. Ownership handles funding rounds, IPOs, dividends, and buybacks. Innovation unlocks technologies. Trading adds limit orders, shorts, and options. Exchange manages foreign reserves. Development upgrades properties.</p><p><b>7. Plan ahead.</b> Planner explains demand drivers, tests operating changes, and simulates 30 possible twelve-month futures without changing your save. Milestones reward different playstyles.</p><p><b>8. Build a legacy.</b> International unlocks 13 cities across five regions. Megaprojects create lasting infrastructure through four funded stages. Ventures backs independent startups. Bank lets you operate a separately capitalized lender. Headquarters manages organizational scale. Dynasty carries prestige advantages across generations.</p><p><b>9. Connect the real constraints.</b> Industries manages operating models and product portfolios. Commerce negotiates supply, trade credit, internal production routes, and customer risk. Facilities separates workforce, equipment, utilities, and storage; construction needs time and cash installments. Decisions tracks the lasting effects of quarterly choices. Bonds offers late-game corporate funding with covenants, maturities, and ownership dilution in distress.</p><p><b>10. Play your way.</b> Chase $1 million, build a chain of cafés, or become a property investor. Save backups in Settings. All markets and money are fictional.</p><div class="actions">${btn("Let’s build", "close")}</div>`,
+        `<h2>A founder’s field guide.</h2><p><b>1. Open your first business.</b> Start with the café ($12,000) and keep a cash buffer. A new business starts with one employee and automatic materials purchasing.</p><p><b>2. Find your margins.</b> Set prices, hire staff, and watch forecast demand versus capacity. Higher prices improve margins but reduce demand. Expansion increases staff slots and rent. Hiring or firing costs 35% of a local monthly base wage per employee.</p><p><b>3. Advance a month.</b> Businesses trade, staff get paid, investments move, and events unfold. Personal living costs start at $650/month. Tax starts at 20% and changes with government policy.</p><p><b>4. Grow your empire.</b> Research improves all businesses. Buy stocks for dividends, properties for rent, or borrow to expand. Cash shortages trigger emergency debt. There is no forced game over.</p><p><b>5. Build a real operation.</b> Operations controls wages, training, suppliers, maintenance, insurance, city, and multi-month product projects. Contracts reserve capacity and pay invoices later. World shows commodity costs and policy. Competitors can be acquired. Treasury offers fixed-rate amortizing loans.</p><p><b>6. Build the group.</b> Supply manages raw-material shipments and shared warehouses. Talent hires executives. Ownership handles funding rounds, IPOs, dividends, and buybacks. Innovation unlocks technologies. Trading adds limit orders, shorts, and options. Exchange manages foreign reserves. Development upgrades properties.</p><p><b>7. Plan ahead.</b> Planner explains demand drivers, tests operating changes, and simulates 30 possible twelve-month futures without changing your save. Milestones reward different playstyles.</p><p><b>8. Build a legacy.</b> International unlocks 13 cities across five regions. Megaprojects create lasting infrastructure through four funded stages. Ventures backs independent startups. Bank lets you operate a separately capitalized lender. Headquarters manages organizational scale. Dynasty carries prestige advantages across generations.</p><p><b>9. Connect the real constraints.</b> Industries manages operating models and product portfolios. Commerce negotiates supply, trade credit, internal production routes, and customer risk. Facilities separates workforce, equipment, utilities, and storage; construction needs time and cash installments. Decisions tracks the lasting effects of quarterly choices. Bonds offers late-game corporate funding with covenants, maturities, and ownership dilution in distress. Accounts tracks actual inventory costs, purchasing mandates, tax losses, quarterly bills, and liquidity commitments. Competitors offers acquisition integration plans and seller financing.</p><p><b>10. Play your way.</b> Chase $1 million, build a chain of cafés, or become a property investor. Save backups in Settings. All markets and money are fictional.</p><div class="actions">${btn("Let’s build", "close")}</div>`,
       );
       break;
   }

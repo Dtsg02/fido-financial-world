@@ -1,9 +1,11 @@
-import { DECISIONS } from "./decisions.js?v=14dae22974bb";
-import { FACILITY_MODULES } from "./facilities.js?v=14dae22974bb";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=14dae22974bb";
-import { TYPES } from "./catalog.js?v=14dae22974bb";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=14dae22974bb";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=14dae22974bb";
+import { RECRUITMENT } from "./workforce.js?v=50124d33bf5b";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=50124d33bf5b";
+import { DECISIONS } from "./decisions.js?v=50124d33bf5b";
+import { FACILITY_MODULES } from "./facilities.js?v=50124d33bf5b";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=50124d33bf5b";
+import { TYPES } from "./catalog.js?v=50124d33bf5b";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=50124d33bf5b";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=50124d33bf5b";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;
@@ -47,6 +49,74 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    if (
+      s.businesses?.some((b) => {
+        const w = b.workforce;
+        return (
+          w &&
+          (!obj(w) ||
+            !Object.hasOwn(RECRUITMENT, w.method) ||
+            !i(w.lastHired, 0, 50) ||
+            !txt(w.lastReport) ||
+            !arr(
+              w.vacancies,
+              (v) =>
+                obj(v) &&
+                i(v.count, 1, 50) &&
+                i(v.remaining, 1, 3) &&
+                Object.hasOwn(RECRUITMENT, v.method) &&
+                i(v.delays),
+              50,
+            ) ||
+            w.vacancies.reduce((n, v) => n + v.count, 0) + b.staff >
+              b.level * 5 ||
+            !arr(
+              w.onboarding,
+              (c) => obj(c) && i(c.count, 1, 50) && i(c.remaining, 1, 2),
+              50,
+            ))
+        );
+      })
+    )
+      return false;
+    if (
+      s.deals &&
+      (!obj(s.deals) ||
+        !i(s.deals.nextId, 1) ||
+        !n(s.deals.interest) ||
+        !arr(
+          s.deals.notes,
+          (x) =>
+            obj(x) &&
+            i(x.id, 1) &&
+            i(x.businessId, 1, Number.MAX_SAFE_INTEGER) &&
+            s.businesses.some((b) => b.id === x.businessId) &&
+            n(x.balance) &&
+            n(x.payment, 0.000001) &&
+            n(x.rate, 0, 1),
+          500,
+        ))
+    )
+      return false;
+    if (
+      s.businesses?.some((b) => {
+        const x = b.integration;
+        if (!x) return false;
+        const p = INTEGRATION_PLANS[x.plan];
+        return (
+          !obj(x) ||
+          !Object.hasOwn(INTEGRATION_PLANS, x.plan) ||
+          !n(x.price, 1) ||
+          !i(x.remaining, 0, p.months) ||
+          !n(x.funded) ||
+          !n(x.monthCost) ||
+          !i(x.stalled) ||
+          !["active", "paused", "complete", "abandoned"].includes(x.status) ||
+          (x.status === "complete" && x.remaining !== 0)
+        );
+      })
+    )
+      return false;
     if (
       s.empire?.warehouseCost &&
       (!Array.isArray(s.empire.warehouseCost) ||

@@ -1,4 +1,6 @@
-import { tradeLiabilities } from "./commerce.js?v=14dae22974bb";
+import { sellerDebt } from "./acquisitions.js?v=50124d33bf5b";
+import { taxLiability } from "./tax.js?v=50124d33bf5b";
+import { tradeLiabilities } from "./commerce.js?v=50124d33bf5b";
 export function bondMarket(s) {
   return (s.bondMarket ??= {
     nextId: 1,
@@ -14,7 +16,12 @@ export function bondDebt(s) {
 }
 export function bondRating(s, nw) {
   const m = bondMarket(s),
-    debt = s.debt + tradeLiabilities(s) + bondDebt(s),
+    debt =
+      s.debt +
+      tradeLiabilities(s) +
+      bondDebt(s) +
+      sellerDebt(s) +
+      taxLiability(s),
     assets = Math.max(1, nw + debt),
     leverage = debt / assets,
     avg =

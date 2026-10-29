@@ -1,6 +1,7 @@
-import { nextTaxMonth, taxLiability } from "./tax.js?v=14dae22974bb";
-import { receiveStock, consumeStock } from "./inventory.js?v=14dae22974bb";
-import { TYPES } from "./catalog.js?v=14dae22974bb";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=50124d33bf5b";
+import { nextTaxMonth, taxLiability } from "./tax.js?v=50124d33bf5b";
+import { receiveStock, consumeStock } from "./inventory.js?v=50124d33bf5b";
+import { TYPES } from "./catalog.js?v=50124d33bf5b";
 export const SUPPLY_HOUSES = [
   {
     id: "cooperative",
@@ -395,7 +396,13 @@ export function commitmentCalendar(s, months = 6) {
     let supplier = c.payables
         .filter((p) => (i === 0 ? p.due <= month : p.due === month))
         .reduce((n, p) => n + p.amount, 0),
-      construction = 0;
+      construction = 0,
+      integration = 0;
+    for (const b of s.businesses) {
+      const x = b.integration;
+      if (x?.status === "active" && i < x.remaining)
+        integration += x.price * INTEGRATION_PLANS[x.plan].cost;
+    }
     for (const a of c.agreements) {
       const delivery = month - a.terms;
       if (delivery > s.month && delivery <= s.month + a.remaining)
@@ -419,6 +426,11 @@ export function commitmentCalendar(s, months = 6) {
       debtService +=
         Math.min(balance, loan.payment) + (balance * loan.rate) / 12;
     }
+    for (const note of s.deals?.notes || []) {
+      const balance = Math.max(0, note.balance - i * note.payment);
+      debtService +=
+        Math.min(balance, note.payment) + (balance * note.rate) / 12;
+    }
     const termDebt = (s.world.bonds || []).reduce((n, b) => n + b.balance, 0);
     debtService += (Math.max(0, s.debt - termDebt) * s.rate) / 12;
     const tax = month === nextTaxMonth(s) ? taxLiability(s) : 0;
@@ -428,8 +440,10 @@ export function commitmentCalendar(s, months = 6) {
       debtService,
       supplier,
       construction,
+      integration,
       receivables,
-      net: receivables - supplier - construction - debtService - tax,
+      net:
+        receivables - supplier - construction - debtService - tax - integration,
     };
   });
 }

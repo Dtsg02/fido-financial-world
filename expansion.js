@@ -1,4 +1,4 @@
-import { warehouseValues } from "./inventory.js?v=14dae22974bb";
+import { warehouseValues } from "./inventory.js?v=50124d33bf5b";
 import {
   TYPES,
   ASSETS,
@@ -8,8 +8,8 @@ import {
   advance,
   resolve,
   log,
-} from "./engine.js?v=14dae22974bb";
-import { INDUSTRY } from "./catalog.js?v=14dae22974bb";
+} from "./engine.js?v=50124d33bf5b";
+import { INDUSTRY } from "./catalog.js?v=50124d33bf5b";
 import {
   COMMODITIES,
   CITIES,
@@ -17,7 +17,7 @@ import {
   productivity,
   materialFactor,
   demandFactor,
-} from "./world.js?v=14dae22974bb";
+} from "./world.js?v=50124d33bf5b";
 import {
   ROLES,
   FX,
@@ -47,7 +47,7 @@ import {
   customerMultiplier,
   deepMaterial,
   deepCapacity,
-} from "./empire.js?v=14dae22974bb";
+} from "./empire.js?v=50124d33bf5b";
 export const expansionPages = [
   "Supply",
   "Talent",

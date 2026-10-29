@@ -26,7 +26,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - **Eight operating models:** subscriptions and churn, hospitality service quality, industrial yield and wear, crop cycles and soil fertility, client trust, accreditation, infrastructure reliability, and retail loyalty. Each has three operating policies and three five-level specialist capabilities.
 - **Product portfolios:** up to eight products per company, two concurrent development projects, three investment tiers, three audience segments, timed launches, support costs, cannibalization, aging, refreshes, and retirement. Rival pricing responds to undercutting and profitable expansion.
 - Pricing elasticity, industry seasonality, macroeconomic exposure, staffing, wages, product quality, marketing, reputation, loyalty, customer segments, and compliance.
-- Employee morale, skill development, resignations, hiring/severance costs, and six specialist executive roles.
+- Employee morale, skill development, resignations, three recruitment channels, 1–3 month hiring lead times, salary-sensitive candidate acceptance, retries, weighted team skill, two-month onboarding, severance and six specialist executive roles. Headcount targets first create vacancies; payroll begins when candidates actually join.
 - Direct suppliers or a shared raw-material warehouse; spot and guaranteed supply policies, shipping delays, freight, storage, spoilage, and cross-industry cost savings.
 - Equipment breakdowns, maintenance, insurance, deductibles, continuity programs, and regulatory audits.
 - Business-level product/process projects, three basic research tracks, and twelve corporate technologies with prerequisites.
@@ -82,6 +82,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 - Supply collateral, internal shipments, facility salvage, supplier payables, and corporate bonds enter modeled net worth. Actual procurement costs remain in inventory until consumption. Internal routes transfer acquisition costs and capitalize freight; spoilage and overflow write off recorded cost. Legacy stock receives a one-time catalog-cost opening basis. Trade-credit principal payments are cash movements, not a second operating expense.
 - Facility construction is carried at 40% of funds paid and completed upgrades at 50% of investment. Internal transfers use 90% of current material value to determine physical yield, with 2.5% freight capitalized into output acquisition cost; this is not a physical bill of materials. Factoring fees, cancellation fees, equity swaps, and issuance costs affect cash/net worth when actioned; they are not a comprehensive accrual ledger.
 - Corporate coupons reduce monthly group profit whether paid or capitalized. Bond maturity failures remain corporate liabilities rather than silently turning into bank loans. Restructuring exchanges debt for 20% cash and 80% outside equity, with no claim of a professional valuation model.
+- Recruitment and severance fees are immediate cash/net-worth costs; they are not yet included in the monthly taxable-income ledger. Cancelled vacancies do not refund fees.
 - Some journals summarize profit rather than logging every cash movement. Cash flow can differ from reported net profit.
 - Emergency credit prevents a forced game over. This is an open-ended sandbox; sustained losses increase debt rather than deleting your world.
 - Product development and specialist upgrades are immediate cash investments with no separate resale carrying value or depreciation schedule. Subscription demand includes retained customers plus new acquisitions; only served customers are billed. Crop cycles alter available monthly output. Product bonuses apply to retail sales, not previously agreed contract prices.
@@ -89,7 +90,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 106 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 121 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -102,6 +103,9 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 ## Source structure
 
 - `dist/inventory.js`, `accounts.js`, `accounts-ui.js`: stock basis, purchasing mandates, management statements and liquidity drills.
+- `dist/acquisitions.js`, `acquisition-ui.js`: integration plans, disruption, funding pauses and seller financing.
+- `dist/tax.js`: tax provisions, quarterly settlements and expiring loss carryforwards.
+- `dist/workforce.js`: recruitment channels, vacancies, candidate acceptance and onboarding.
 - `dist/catalog.js`: industry definitions and sector characteristics.
 - `dist/commerce.js`, `commerce-ui.js`: supply agreements, trade credit, internal production routes, customer risk, factoring, and commitments.
 - `dist/facilities.js`, `facility-ui.js`: physical bottlenecks, construction, shifts, maintenance, and storage.
@@ -119,3 +123,7 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 Keep private save exports outside the public deployment folder.
 
 Prepare cache-safe static assets with `python3 scripts/prepare-release.py`, then review and push the dedicated `public-release` repository. This preparation command does not publish automatically.
+
+### Acquisition integration
+
+Acquisitions can be funded entirely in cash or with 60% upfront and 40% seller financing, amortized over twelve months at a fixed 10% annual rate. Three integration plans trade six to twelve months of disruption and funding against different permanent operating benefits. Pausing or failing to fund a month delays completion and reduces morale; abandoning forfeits benefits and damages reputation. Seller notes survive abandonment. Integration and financing commitments enter liquidity planning, and company disposal is blocked until they are resolved.

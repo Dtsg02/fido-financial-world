@@ -1,4 +1,4 @@
-import { commitmentCalendar } from "./commerce.js?v=14dae22974bb";
+import { commitmentCalendar } from "./commerce.js?v=50124d33bf5b";
 import {
   commerce,
   SUPPLY_HOUSES,
@@ -12,8 +12,8 @@ import {
   routeAllowed,
   addRoute,
   factorInvoice,
-} from "./commerce.js?v=14dae22974bb";
-import { forecast } from "./engine.js?v=14dae22974bb";
+} from "./commerce.js?v=50124d33bf5b";
+import { forecast } from "./engine.js?v=50124d33bf5b";
 export function commerceContent(s, h) {
   const c = commerce(s),
     { heading, btn, money, esc, stat } = h;
@@ -56,7 +56,7 @@ export function commerceContent(s, h) {
     )
       .map(
         (r) =>
-          `<div class="product-row"><h3>Month ${r.month + 1}</h3><div class="balance-line"><span>Customer invoices due</span><b>${money(r.receivables)}</b></div><div class="balance-line"><span>Supplier invoices & orders</span><b>−${money(r.supplier)}</b></div><div class="balance-line"><span>Construction installments</span><b>−${money(r.construction)}</b></div><div class="balance-line"><span>Debt principal & interest</span><b>−${money(r.debtService)}</b></div><div class="balance-line"><span>Accrued taxes due</span><b>−${money(r.tax)}</b></div><div class="balance-line"><span>Scheduled net</span><b class="${r.net < 0 ? "negative" : "positive"}">${money(r.net)}</b></div></div>`,
+          `<div class="product-row"><h3>Month ${r.month + 1}</h3><div class="balance-line"><span>Customer invoices due</span><b>${money(r.receivables)}</b></div><div class="balance-line"><span>Supplier invoices & orders</span><b>−${money(r.supplier)}</b></div><div class="balance-line"><span>Construction installments</span><b>−${money(r.construction)}</b></div><div class="balance-line"><span>Debt principal & interest</span><b>−${money(r.debtService)}</b></div><div class="balance-line"><span>Accrued taxes due</span><b>−${money(r.tax)}</b></div><div class="balance-line"><span>Integration budgets</span><b>−${money(r.integration)}</b></div><div class="balance-line"><span>Scheduled net</span><b class="${r.net < 0 ? "negative" : "positive"}">${money(r.net)}</b></div></div>`,
       )
       .join(
         "",

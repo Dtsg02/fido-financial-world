@@ -1,18 +1,25 @@
-import { taxClose, taxLiability } from "./tax.js?v=14dae22974bb";
-import { purchasePlan, closeAccounts } from "./accounts.js?v=14dae22974bb";
+import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=50124d33bf5b";
+import {
+  beforeAcquisitionMonth,
+  integrationEffects,
+  sellerDebt,
+  deals,
+} from "./acquisitions.js?v=50124d33bf5b";
+import { taxClose, taxLiability } from "./tax.js?v=50124d33bf5b";
+import { purchasePlan, closeAccounts } from "./accounts.js?v=50124d33bf5b";
 import {
   stockValue,
   receiveStock,
   consumeStock,
   warehouseValues,
-} from "./inventory.js?v=14dae22974bb";
-import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=14dae22974bb";
+} from "./inventory.js?v=50124d33bf5b";
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=50124d33bf5b";
 import {
   generateDecision,
   beforeDecisionMonth,
   decisionModifiers,
   resolveDecision,
-} from "./decisions.js?v=14dae22974bb";
+} from "./decisions.js?v=50124d33bf5b";
 import {
   facility,
   facilityAssets,
@@ -20,7 +27,7 @@ import {
   facilityOverhead,
   beforeFacilityMonth,
   enforceStorage,
-} from "./facilities.js?v=14dae22974bb";
+} from "./facilities.js?v=50124d33bf5b";
 import {
   commerce,
   commercialAssets,
@@ -28,14 +35,14 @@ import {
   beforeCommerceMonth,
   procureSupply,
   routeProduction,
-} from "./commerce.js?v=14dae22974bb";
+} from "./commerce.js?v=50124d33bf5b";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=14dae22974bb";
-import { validateAdvanced } from "./advanced-validation.js?v=14dae22974bb";
+} from "./sectors.js?v=50124d33bf5b";
+import { validateAdvanced } from "./advanced-validation.js?v=50124d33bf5b";
 import {
   ensureLate,
   internationalDemand,
@@ -45,7 +52,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=14dae22974bb";
+} from "./late.js?v=50124d33bf5b";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -58,8 +65,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=14dae22974bb";
-import { validateExtra } from "./validation.js?v=14dae22974bb";
+} from "./empire.js?v=50124d33bf5b";
+import { validateExtra } from "./validation.js?v=50124d33bf5b";
 import {
   ensureWorld,
   initBusiness,
@@ -71,8 +78,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=14dae22974bb";
-import { TYPES } from "./catalog.js?v=14dae22974bb";
+} from "./world.js?v=50124d33bf5b";
+import { TYPES } from "./catalog.js?v=50124d33bf5b";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
@@ -150,7 +157,8 @@ export function worth(s) {
     s.cash -
     s.debt -
     bondDebt(s) -
-    taxLiability(s) +
+    taxLiability(s) -
+    sellerDebt(s) +
     additionalAssets(s) +
     lateAssets(s) +
     commercialAssets(s) +
@@ -237,7 +245,9 @@ export function forecast(s, b) {
       deepCapacity(s) *
       adminMultiplier(s) *
       sector.capacity *
-      decision.capacity,
+      onboardingCapacity(b) *
+      decision.capacity *
+      integrationEffects(b).capacity,
   );
   const facilityPlan = facilityLimits(b, capacity);
   capacity = facilityPlan.capacity;
@@ -256,7 +266,8 @@ export function forecast(s, b) {
       customerMultiplier(s, b) *
       internationalDemand(s, b) *
       sector.demand *
-      decision.demand,
+      decision.demand *
+      integrationEffects(b).demand,
   );
   demand = sectorDemand(b, demand);
   let units = Math.min(capacity, demand);
@@ -281,6 +292,7 @@ export function forecast(s, b) {
     b.compliance +
     b.brandInvestment -
     (completed(s, "ocean") ? s.world.policy.carbon * 0.5 : 0);
+  overhead *= integrationEffects(b).overhead;
   let expense = units * unit + overhead;
   return {
     facilityPlan,
@@ -318,6 +330,8 @@ export function advance(s) {
   beforeSectorMonth(s, rand);
   beforeFacilityMonth(s, rand);
   beforeDecisionMonth(s, rand);
+  beforeAcquisitionMonth(s);
+  beforeWorkforceMonth(s, rand);
   let revenue = 0,
     operating = 0;
   let details = [];
@@ -367,12 +381,18 @@ export function advance(s) {
     let sales = sold * f.salePrice + contract.revenue;
     let overhead = f.overhead;
     let subsidy = b.type === "energy" ? s.world.policy.subsidy * b.level : 0;
-    let profit = sales - costOfSales - b.stockWriteoff - overhead + subsidy;
+    let profit =
+      sales -
+      costOfSales -
+      b.stockWriteoff -
+      overhead -
+      (b.integration?.monthCost || 0) +
+      subsidy;
     b.lastAccounts = {
       month: s.month,
       revenue: sales,
       costOfSales,
-      overhead,
+      overhead: overhead + (b.integration?.monthCost || 0),
       subsidy,
       writeoffs: b.stockWriteoff,
       gross: sales - costOfSales,
@@ -396,7 +416,7 @@ export function advance(s) {
     operating += profit;
     details.push(b.name + ": " + Math.round(profit));
   }
-  operating -= commerce(s).expense + bondMarket(s).expense;
+  operating -= commerce(s).expense + bondMarket(s).expense + deals(s).interest;
   let dividend = 0;
   s.prices = s.prices.map((p, i) => {
     let a = ASSETS[i];

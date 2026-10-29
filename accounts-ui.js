@@ -1,11 +1,11 @@
-import { taxOffice, nextTaxMonth } from "./tax.js?v=14dae22974bb";
+import { taxOffice, nextTaxMonth } from "./tax.js?v=50124d33bf5b";
 import {
   workingCapital,
   purchasing,
   setPurchasing,
   liquidityDrill,
-} from "./accounts.js?v=14dae22974bb";
-import { stockValue } from "./inventory.js?v=14dae22974bb";
+} from "./accounts.js?v=50124d33bf5b";
+import { stockValue } from "./inventory.js?v=50124d33bf5b";
 export function accountsContent(s, h) {
   const { heading, money, esc, btn, stat } = h,
     w = workingCapital(s);
@@ -44,7 +44,7 @@ export function accountsContent(s, h) {
           .join("")
       : "<p>No unused tax losses.</p>"
   }</div></div></section>
-  <section class="card industry-card"><h2>Twelve-month liquidity drill</h2><p>Can today's cash cover signed commitments if fresh trading contributes no cash? Compare collection outcomes before funding more expansion. This drill includes supplier commitments, facility installments, term-loan principal, current-rate credit interest, and corporate coupons and bullet maturities, and already-accrued taxes. It assumes debts are paid on schedule, no refinancing, and fixed current rates. It excludes future sales, payroll, rent, future tax accruals, new investments, collateral returns and interest discounts.</p><div class="catalog">${[
+  <section class="card industry-card"><h2>Twelve-month liquidity drill</h2><p>Can today's cash cover signed commitments if fresh trading contributes no cash? Compare collection outcomes before funding more expansion. This drill includes supplier commitments, facility installments, integration budgets, seller notes, term-loan principal, current-rate credit interest, and corporate coupons and bullet maturities, and already-accrued taxes. It assumes debts are paid on schedule, no refinancing, and fixed current rates. It excludes future sales, payroll, rent, future tax accruals, new investments, collateral returns and interest discounts.</p><div class="catalog">${[
     [1, "Full invoice collection"],
     [0.7, "30% collection shortfall"],
     [0.4, "60% collection shortfall"],
