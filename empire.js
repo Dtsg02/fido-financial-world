@@ -1,5 +1,7 @@
-import { TYPES, INDUSTRY } from "./catalog.js?v=5183cae63dc0";
-import { rng, ensureWorld, city, supplier, report } from "./world.js?v=5183cae63dc0";
+import { commerce } from "./commerce.js?v=14dae22974bb";
+import { warehouseValues } from "./inventory.js?v=14dae22974bb";
+import { TYPES, INDUSTRY } from "./catalog.js?v=14dae22974bb";
+import { rng, ensureWorld, city, supplier, report } from "./world.js?v=14dae22974bb";
 export const ROLES = [
   {
     id: "coo",
@@ -575,16 +577,21 @@ export function orderMaterials(s, index, lots, mode) {
 export function warehouseProduction(s, b, units, unitCost) {
   if (!b.warehouse) return { units: 0, cost: 0 };
   let i = INDUSTRY[b.type].commodity;
+  const basis = warehouseValues(s);
   let lotsPerUnit = unitCost / s.world.commodities[i];
   let produced = Math.min(
     units,
     Math.floor(s.empire.warehouse[i] / lotsPerUnit),
   );
+  const cost = s.empire.warehouse[i]
+    ? basis[i] * ((produced * lotsPerUnit) / s.empire.warehouse[i])
+    : 0;
+  basis[i] = Math.max(0, basis[i] - cost);
   s.empire.warehouse[i] = Math.max(
     0,
     s.empire.warehouse[i] - produced * lotsPerUnit,
   );
-  return { units: produced, cost: produced * unitCost };
+  return { units: produced, cost };
 }
 export function hire(s, id) {
   ensureEmpire(s);
@@ -853,9 +860,11 @@ export function propertyIncome(s, p, base) {
 export function beforeEmpireMonth(s) {
   ensureEmpire(s);
   let e = s.empire;
+  const basis = warehouseValues(s);
   e.monthExpense = 0;
   e.monthIncome = 0;
   for (let shipment of e.shipments.filter((x) => x.due <= s.month)) {
+    basis[shipment.index] += shipment.cost + shipment.freight;
     e.warehouse[shipment.index] += shipment.lots;
     e.shipmentsReceived++;
     report(
@@ -870,7 +879,11 @@ export function beforeEmpireMonth(s) {
   );
   s.cash -= storage;
   e.monthExpense += storage;
-  e.warehouse[0] *= has(s, "coldchain") ? 0.995 : 0.98;
+  const retained = has(s, "coldchain") ? 0.995 : 0.98;
+  // Noncash loss belongs in operating profit, not the cash-expense addback.
+  commerce(s).expense += basis[0] * (1 - retained);
+  basis[0] *= retained;
+  e.warehouse[0] *= retained;
   for (let x of e.executives) {
     s.cash -= x.salary;
     e.monthExpense += x.salary;
@@ -1079,8 +1092,8 @@ export function additionalAssets(s) {
   if (!s.empire) return 0;
   let e = s.empire;
   return (
-    e.warehouse.reduce((n, v, i) => n + v * s.world.commodities[i], 0) +
-    e.shipments.reduce((n, x) => n + x.cost, 0) +
+    warehouseValues(s).reduce((n, v) => n + v, 0) +
+    e.shipments.reduce((n, x) => n + x.cost + x.freight, 0) +
     e.fxHoldings.reduce((n, v, i) => n + v * e.fx[i], 0) +
     e.shorts.reduce((n, p) => n + shortEquity(s, p), 0) +
     e.options.reduce(

@@ -1,4 +1,5 @@
-import { TYPES } from "./catalog.js?v=5183cae63dc0";
+import { consumeStock } from "./inventory.js?v=14dae22974bb";
+import { TYPES } from "./catalog.js?v=14dae22974bb";
 // Every industry uses one operating model, with persistent state and explicit tradeoffs.
 export const MODELS = {
   subscription: {
@@ -311,7 +312,7 @@ export function beforeSectorMonth(s, random) {
       q.spoiled = Math.floor(
         b.inventory * Math.max(0.02, 0.14 - q.upgrades.resilience * 0.02),
       );
-      b.inventory -= q.spoiled;
+      b.stockWriteoff = (b.stockWriteoff || 0) + consumeStock(b, q.spoiled);
     }
   }
 }

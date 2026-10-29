@@ -1,6 +1,8 @@
-import { TYPES, INDUSTRY } from "./catalog.js?v=5183cae63dc0";
-import { CITIES, rng, city, report } from "./world.js?v=5183cae63dc0";
-import { ensureEmpire, has } from "./empire.js?v=5183cae63dc0";
+import { warehouseValues } from "./inventory.js?v=14dae22974bb";
+import { commerce } from "./commerce.js?v=14dae22974bb";
+import { TYPES, INDUSTRY } from "./catalog.js?v=14dae22974bb";
+import { CITIES, rng, city, report } from "./world.js?v=14dae22974bb";
+import { ensureEmpire, has } from "./empire.js?v=14dae22974bb";
 export const REGIONS = [
   {
     id: "home",
@@ -555,12 +557,17 @@ export function fundMega(s, id) {
     cost = megaStageCost(p, next),
     materials = p.material / 3;
   if (s.cash < cost || s.empire.warehouse[1] + 1e-8 < materials) return false;
+  const basis = warehouseValues(s);
+  const materialCost = s.empire.warehouse[1]
+    ? basis[1] * Math.min(1, materials / s.empire.warehouse[1])
+    : 0;
+  basis[1] = Math.max(0, basis[1] - materialCost);
   s.cash -= cost;
   s.empire.warehouse[1] = Math.max(0, s.empire.warehouse[1] - materials);
   q.stage = next;
   q.remaining = Math.ceil(p.months / 4);
   q.status = "building";
-  q.invested += cost;
+  q.invested += cost + materialCost;
   return true;
 }
 export function makeVentures(s) {
@@ -746,8 +753,16 @@ export function beforeLateMonth(s) {
   }
   if (completed(s, "research") && s.month % 2 === 0)
     for (let p of s.empire.researchProjects) if (p.remaining > 1) p.remaining--;
-  if (completed(s, "ocean"))
-    s.empire.warehouse[0] /= has(s, "coldchain") ? 0.995 : 0.98;
+  if (completed(s, "ocean")) {
+    const retained = has(s, "coldchain") ? 0.995 : 0.98;
+    const basis = warehouseValues(s);
+    commerce(s).expense = Math.max(
+      0,
+      commerce(s).expense - basis[0] * (1 / retained - 1),
+    );
+    basis[0] /= retained;
+    s.empire.warehouse[0] /= retained;
+  }
   for (let v of l.ventures.filter((v) => v.status === "active")) {
     v.age++;
     v.runway--;

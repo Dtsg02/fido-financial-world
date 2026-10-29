@@ -1,4 +1,4 @@
-import { commitmentCalendar } from "./commerce.js?v=5183cae63dc0";
+import { commitmentCalendar } from "./commerce.js?v=14dae22974bb";
 import {
   commerce,
   SUPPLY_HOUSES,
@@ -12,8 +12,8 @@ import {
   routeAllowed,
   addRoute,
   factorInvoice,
-} from "./commerce.js?v=5183cae63dc0";
-import { forecast } from "./engine.js?v=5183cae63dc0";
+} from "./commerce.js?v=14dae22974bb";
+import { forecast } from "./engine.js?v=14dae22974bb";
 export function commerceContent(s, h) {
   const c = commerce(s),
     { heading, btn, money, esc, stat } = h;
@@ -34,7 +34,7 @@ export function commerceContent(s, h) {
         .join("") ||
       "<p>No committed orders. Existing spot purchasing remains available.</p>"
     }</div><p class="explain">Credit limits depend on business value and reputation. Deliveries can be partial when credit is exhausted. Late payment adds 2% to the unpaid balance per month and suspends the agreement until arrears are settled. Early termination costs 8% of remaining committed purchases. Collateral remains yours until released.</p></section>
-<section class="card industry-card"><div class="split"><div><span class="tag">VERTICAL INTEGRATION</span><h2>Production routes</h2></div>${btn("Connect businesses", "commerce:route", "", s.businesses.length < 2)}</div><p>Reserve upstream production for your own downstream business. B2B contracts receive capacity first, then internal routes, then retail customers. Internal transfers generate no sales revenue.</p>${c.routes.map((r) => `<div class="product-row"><div class="split"><h3>${name(r.from)} → ${name(r.to)}</h3><span class="tag">${r.enabled ? "ENABLED" : "PAUSED"}</span></div><p>Target ${r.units} upstream units/month · Last sent ${r.lastSent} → ${r.lastReceived} downstream input units</p><div class="actions">${btn(r.enabled ? "Pause" : "Resume", "commerce:routepause:" + r.id, "light")}${btn("Remove route", "commerce:routeremove:" + r.id, "light")}</div></div>`).join("") || "<p>Build complementary companies to start an internal supply network.</p>"}<p class="explain">One outgoing route per source. Conversion uses material value at 90% efficiency, plus 2.5% freight paid immediately. Deliveries arrive next month, so chains need working capital and buffer stock. Routes consume real inventory and production capacity; they cannot create free output. Removing a route does not cancel goods already in transit.</p>${c.shipments.map((x) => `<div class="balance-line"><span>${name(x.from)} → ${name(x.to)} · ${x.units} units</span><b>Month ${x.due + 1}</b></div>`).join("")}</section>
+<section class="card industry-card"><div class="split"><div><span class="tag">VERTICAL INTEGRATION</span><h2>Production routes</h2></div>${btn("Connect businesses", "commerce:route", "", s.businesses.length < 2)}</div><p>Reserve upstream production for your own downstream business. B2B contracts receive capacity first, then internal routes, then retail customers. Internal transfers generate no sales revenue.</p>${c.routes.map((r) => `<div class="product-row"><div class="split"><h3>${name(r.from)} → ${name(r.to)}</h3><span class="tag">${r.enabled ? "ENABLED" : "PAUSED"}</span></div><p>Target ${r.units} upstream units/month · Last sent ${r.lastSent} → ${r.lastReceived} downstream input units</p><div class="actions">${btn(r.enabled ? "Pause" : "Resume", "commerce:routepause:" + r.id, "light")}${btn("Remove route", "commerce:routeremove:" + r.id, "light")}</div></div>`).join("") || "<p>Build complementary companies to start an internal supply network.</p>"}<p class="explain">One outgoing route per source. Conversion uses current material prices at 90% physical efficiency, plus 2.5% freight paid immediately. Actual acquisition cost and freight are carried into the resulting inventory; lower yield raises its cost per unit. Deliveries arrive next month, so chains need working capital and buffer stock. Routes consume real inventory and production capacity; they cannot create free output. Removing a route does not cancel goods already in transit.</p>${c.shipments.map((x) => `<div class="balance-line"><span>${name(x.from)} → ${name(x.to)} · ${x.units} units</span><b>Month ${x.due + 1}</b></div>`).join("")}</section>
 <section class="card industry-card"><span class="tag">CREDIT CONTROL</span><h2>Customer underwriting</h2><p>Set terms for newly accepted B2B contracts. Existing contracts keep their signed risk and price. Probability below is the chance a due invoice misses a payment attempt; recessions multiply it by 1.6. A third missed attempt defaults with 30% recovery.</p><div class="actions">${[
       ["strict", "Strict · 2% risk · −3% price"],
       ["standard", "Standard · 7% risk · quoted price"],
@@ -51,12 +51,12 @@ export function commerceContent(s, h) {
       .join(
         "",
       )}</div><div class="balance-line"><span>Lifetime write-offs</span><b>${money(c.badDebt)}</b></div><div class="balance-line"><span>Lifetime factoring fees</span><b>${money(c.factoring)}</b></div><h3>Outstanding customer invoices</h3>${s.world.receivables.map((r, i) => `<div class="product-row"><div class="split"><h3>${esc(r.client)}</h3><b>${money(r.amount)}</b></div><p>Due month ${r.due + 1} · ${r.late ? "Late: " + r.late + " missed attempts" : r.risk ? Math.round(r.risk * 100) + "% payment risk" : "Legacy guaranteed invoice"}</p>${btn("Sell invoice · " + money(r.amount * (1 - Math.min(0.2, 0.025 + 0.015 * (r.due - s.month)))), "commerce:factor:" + i, "light", r.due <= s.month || !!r.late)}</div>`).join("") || "<p>No customer invoices outstanding.</p>"}<p class="explain">Factoring sells a not-yet-due invoice without recourse: instant cash, no future collection. Fee: 2.5% plus 1.5% per month until due, capped at 20%. Late invoices cannot be factored.</p></section>
-<section class="card industry-card"><h2>Six-month commitment calendar</h2><p>Scheduled collections versus committed supply and construction payments. Assumes full delivery and construction funding; excludes new sales, payroll, rent, tax, bank debt, and potential defaults. This is a commitments schedule, not a cash-runway forecast.</p><div class="catalog">${commitmentCalendar(
+<section class="card industry-card"><h2>Six-month commitment calendar</h2><p>Scheduled collections versus committed supply, construction and debt payments. Assumes full delivery and construction funding; excludes new sales, payroll, rent, future tax accruals, interest discounts, and potential defaults. This is a commitments schedule, not a cash-runway forecast.</p><div class="catalog">${commitmentCalendar(
       s,
     )
       .map(
         (r) =>
-          `<div class="product-row"><h3>Month ${r.month + 1}</h3><div class="balance-line"><span>Customer invoices due</span><b>${money(r.receivables)}</b></div><div class="balance-line"><span>Supplier invoices & orders</span><b>−${money(r.supplier)}</b></div><div class="balance-line"><span>Construction installments</span><b>−${money(r.construction)}</b></div><div class="balance-line"><span>Scheduled net</span><b class="${r.net < 0 ? "negative" : "positive"}">${money(r.net)}</b></div></div>`,
+          `<div class="product-row"><h3>Month ${r.month + 1}</h3><div class="balance-line"><span>Customer invoices due</span><b>${money(r.receivables)}</b></div><div class="balance-line"><span>Supplier invoices & orders</span><b>−${money(r.supplier)}</b></div><div class="balance-line"><span>Construction installments</span><b>−${money(r.construction)}</b></div><div class="balance-line"><span>Debt principal & interest</span><b>−${money(r.debtService)}</b></div><div class="balance-line"><span>Accrued taxes due</span><b>−${money(r.tax)}</b></div><div class="balance-line"><span>Scheduled net</span><b class="${r.net < 0 ? "negative" : "positive"}">${money(r.net)}</b></div></div>`,
       )
       .join(
         "",

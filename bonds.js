@@ -1,4 +1,4 @@
-import { tradeLiabilities } from "./commerce.js?v=5183cae63dc0";
+import { tradeLiabilities } from "./commerce.js?v=14dae22974bb";
 export function bondMarket(s) {
   return (s.bondMarket ??= {
     nextId: 1,

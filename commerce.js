@@ -1,4 +1,6 @@
-import { TYPES } from "./catalog.js?v=5183cae63dc0";
+import { nextTaxMonth, taxLiability } from "./tax.js?v=14dae22974bb";
+import { receiveStock, consumeStock } from "./inventory.js?v=14dae22974bb";
+import { TYPES } from "./catalog.js?v=14dae22974bb";
 export const SUPPLY_HOUSES = [
   {
     id: "cooperative",
@@ -200,7 +202,7 @@ export function beforeCommerceMonth(s) {
   for (const shipment of c.shipments.filter((x) => x.due <= s.month)) {
     const b = s.businesses.find((b) => b.id === shipment.to);
     if (b) {
-      b.inventory += shipment.units;
+      receiveStock(b, shipment.units, shipment.value);
       report(s, `${b.name} received ${shipment.units} internal input units.`);
     } else {
       s.cash += shipment.value * 0.8;
@@ -250,8 +252,7 @@ export function procureSupply(s, b, baseUnit, random) {
         due: s.month + a.terms,
       });
     else s.cash -= cost;
-    b.inventory += units;
-    c.expense += cost - units * baseUnit;
+    receiveStock(b, units, cost);
   }
   a.delivered = units;
   if (units < a.units) {
@@ -303,11 +304,9 @@ export function routeProduction(s, b, capacity, unitCost) {
   r.lastSent = 0;
   r.lastReceived = 0;
   if (!converted || s.cash < freight) return 0;
-  b.inventory -= quantity;
+  const actualCost = consumeStock(b, quantity);
   s.cash -= freight;
-  c.expense += freight;
-  const shipmentValue = converted * type(target).unit;
-  c.expense += value - shipmentValue;
+  const shipmentValue = actualCost + freight;
   c.shipments.push({
     id: c.nextId++,
     from: b.id,
@@ -409,12 +408,28 @@ export function commitmentCalendar(s, months = 6) {
     const receivables = s.world.receivables
       .filter((p) => (i === 0 ? p.due <= month : p.due === month))
       .reduce((n, p) => n + p.amount, 0);
+    let debtService = 0;
+    for (const b of s.bondMarket?.bonds || []) {
+      const due = Math.max(s.month + 1, b.maturity);
+      if (month <= due) debtService += (b.balance * b.coupon) / 12;
+      if (month === due) debtService += b.balance;
+    }
+    for (const loan of s.world.bonds || []) {
+      const balance = Math.max(0, loan.balance - i * loan.payment);
+      debtService +=
+        Math.min(balance, loan.payment) + (balance * loan.rate) / 12;
+    }
+    const termDebt = (s.world.bonds || []).reduce((n, b) => n + b.balance, 0);
+    debtService += (Math.max(0, s.debt - termDebt) * s.rate) / 12;
+    const tax = month === nextTaxMonth(s) ? taxLiability(s) : 0;
     return {
       month,
+      tax,
+      debtService,
       supplier,
       construction,
       receivables,
-      net: receivables - supplier - construction,
+      net: receivables - supplier - construction - debtService - tax,
     };
   });
 }

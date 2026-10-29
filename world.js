@@ -1,6 +1,7 @@
-import { facility } from "./facilities.js?v=5183cae63dc0";
-import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=5183cae63dc0";
-import { TYPES, INDUSTRY } from "./catalog.js?v=5183cae63dc0";
+import { consumeStock } from "./inventory.js?v=14dae22974bb";
+import { facility } from "./facilities.js?v=14dae22974bb";
+import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=14dae22974bb";
+import { TYPES, INDUSTRY } from "./catalog.js?v=14dae22974bb";
 // Interconnected strategy systems. All randomness uses the save's seeded generator.
 export const CITIES = [
   {
@@ -444,7 +445,8 @@ export function beforeMonth(s) {
 }
 export function fulfill(s, b, capacity) {
   let revenue = 0,
-    units = 0;
+    units = 0,
+    cost = 0;
   for (let c of s.world.contracts.filter(
     (x) => x.businessId === b.id && x.status === "active",
   )) {
@@ -454,7 +456,7 @@ export function fulfill(s, b, capacity) {
       Math.max(0, capacity - units),
     );
     if (n <= 0) continue;
-    b.inventory -= n;
+    cost += consumeStock(b, n);
     c.delivered += n;
     units += n;
     let amount = n * c.price;
@@ -478,7 +480,7 @@ export function fulfill(s, b, capacity) {
     }
   }
   b.contractSold = units;
-  return { revenue, units };
+  return { revenue, units, cost };
 }
 export function afterMonth(s) {
   let w = s.world;

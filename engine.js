@@ -1,10 +1,18 @@
-import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=5183cae63dc0";
+import { taxClose, taxLiability } from "./tax.js?v=14dae22974bb";
+import { purchasePlan, closeAccounts } from "./accounts.js?v=14dae22974bb";
+import {
+  stockValue,
+  receiveStock,
+  consumeStock,
+  warehouseValues,
+} from "./inventory.js?v=14dae22974bb";
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=14dae22974bb";
 import {
   generateDecision,
   beforeDecisionMonth,
   decisionModifiers,
   resolveDecision,
-} from "./decisions.js?v=5183cae63dc0";
+} from "./decisions.js?v=14dae22974bb";
 import {
   facility,
   facilityAssets,
@@ -12,7 +20,7 @@ import {
   facilityOverhead,
   beforeFacilityMonth,
   enforceStorage,
-} from "./facilities.js?v=5183cae63dc0";
+} from "./facilities.js?v=14dae22974bb";
 import {
   commerce,
   commercialAssets,
@@ -20,14 +28,14 @@ import {
   beforeCommerceMonth,
   procureSupply,
   routeProduction,
-} from "./commerce.js?v=5183cae63dc0";
+} from "./commerce.js?v=14dae22974bb";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=5183cae63dc0";
-import { validateAdvanced } from "./advanced-validation.js?v=5183cae63dc0";
+} from "./sectors.js?v=14dae22974bb";
+import { validateAdvanced } from "./advanced-validation.js?v=14dae22974bb";
 import {
   ensureLate,
   internationalDemand,
@@ -37,7 +45,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=5183cae63dc0";
+} from "./late.js?v=14dae22974bb";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -50,8 +58,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=5183cae63dc0";
-import { validateExtra } from "./validation.js?v=5183cae63dc0";
+} from "./empire.js?v=14dae22974bb";
+import { validateExtra } from "./validation.js?v=14dae22974bb";
 import {
   ensureWorld,
   initBusiness,
@@ -63,8 +71,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=5183cae63dc0";
-import { TYPES } from "./catalog.js?v=5183cae63dc0";
+} from "./world.js?v=14dae22974bb";
+import { TYPES } from "./catalog.js?v=14dae22974bb";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
@@ -141,16 +149,14 @@ export function worth(s) {
   return (
     s.cash -
     s.debt -
-    bondDebt(s) +
+    bondDebt(s) -
+    taxLiability(s) +
     additionalAssets(s) +
     lateAssets(s) +
     commercialAssets(s) +
     s.businesses.reduce(
       (v, b) =>
-        v +
-        type(b).cost * b.level * 0.75 +
-        b.inventory * type(b).unit +
-        facilityAssets(b),
+        v + type(b).cost * b.level * 0.75 + stockValue(b) + facilityAssets(b),
       0,
     ) +
     (s.world?.receivables || []).reduce((n, r) => n + r.amount, 0) +
@@ -290,6 +296,13 @@ export function forecast(s, b) {
   };
 }
 export function advance(s) {
+  const openingCash = s.cash;
+  for (const b of s.businesses) {
+    stockValue(b);
+    b.stockWriteoff = 0;
+  }
+  ensureLate(s);
+  warehouseValues(s);
   s.month++;
   s.loanAge++;
   let cycle = Math.sin(s.month / 7) * 0.12;
@@ -323,15 +336,18 @@ export function advance(s) {
     if (b.auto && agreement.fallback) {
       let buy = Math.max(0, target - b.inventory);
       let warehouse = warehouseProduction(s, b, buy, f.unit);
-      b.inventory += warehouse.units;
+      receiveStock(b, warehouse.units, warehouse.cost);
       buy -= warehouse.units;
       if (b.warehouse && !b.warehouseFallback) buy = 0;
-      let affordable = Math.max(0, Math.floor(s.cash / f.unit));
-      buy = Math.floor(Math.min(buy, affordable) * (b.supplyFactor || 1));
+      buy =
+        b.warehouse && !b.warehouseFallback
+          ? 0
+          : purchasePlan(s, b, target, f.unit, f.facilityPlan.storage);
+      buy = Math.floor(buy * (b.supplyFactor || 1));
       s.cash -= buy * f.unit;
-      b.inventory += buy;
+      receiveStock(b, buy, buy * f.unit);
     }
-    commerce(s).expense += enforceStorage(b, f.unit);
+    b.stockWriteoff += enforceStorage(b, f.unit);
     let contract = fulfill(s, b, capacity);
     const routed = routeProduction(
       s,
@@ -344,14 +360,25 @@ export function advance(s) {
       Math.max(0, capacity - contract.units - routed),
       b.inventory,
     );
-    b.inventory -= sold;
+    const costOfSales = consumeStock(b, sold) + contract.cost;
     facility(b).lastUtilization = capacity
       ? Math.min(1, (sold + contract.units + routed) / capacity)
       : 0;
     let sales = sold * f.salePrice + contract.revenue;
     let overhead = f.overhead;
     let subsidy = b.type === "energy" ? s.world.policy.subsidy * b.level : 0;
-    let profit = sales - (sold + contract.units) * f.unit - overhead + subsidy;
+    let profit = sales - costOfSales - b.stockWriteoff - overhead + subsidy;
+    b.lastAccounts = {
+      month: s.month,
+      revenue: sales,
+      costOfSales,
+      overhead,
+      subsidy,
+      writeoffs: b.stockWriteoff,
+      gross: sales - costOfSales,
+      profit,
+      inventory: stockValue(b),
+    };
     s.cash += sold * f.salePrice - overhead + subsidy;
     b.lastRevenue = sales;
     b.lastProfit = profit;
@@ -399,12 +426,15 @@ export function advance(s) {
       (completed(s, "exchange") ? 0.9 : 1) +
     s.world.monthCosts +
     s.empire.monthExpense;
-  let tax =
-    Math.max(0, operating + s.empire.monthIncome + dividend + rent - interest) *
-    s.world.policy.tax;
+  const taxResult = taxClose(
+    s,
+    operating + s.empire.monthIncome + dividend + rent - interest,
+  );
+  let tax = taxResult.provision;
   let living = 650 * s.inflation;
   let passive = dividend + rent - interest - tax - living;
-  s.cash += passive + s.world.monthCosts + s.empire.monthExpense;
+  s.cash +=
+    passive + s.world.monthCosts + s.empire.monthExpense + tax - taxResult.paid;
   s.profit = operating + s.empire.monthIncome + passive;
   s.revenue = revenue + dividend + Math.max(0, rent);
   s.lastCosts = {
@@ -422,11 +452,7 @@ export function advance(s) {
   s.profit -= s.empire.monthExpense - beforeCosts;
   log(s, "Month closed: operating profit", operating);
   if (commerce(s).expense)
-    log(
-      s,
-      "Trade price adjustments, credit losses and stock write-offs",
-      -commerce(s).expense,
-    );
+    log(s, "Trade credit losses and financing charges", -commerce(s).expense);
   log(s, "Portfolio income and rent", dividend + rent);
   log(s, "Tax, interest and living costs", -interest - tax - living);
   if (s.cash < 0) {
@@ -503,6 +529,7 @@ export function advance(s) {
     profit: s.profit,
   });
   s.history = s.history.slice(-60);
+  closeAccounts(s, openingCash);
   return details;
 }
 export function resolve(s, accept) {
@@ -546,7 +573,11 @@ export function valid(s) {
           b.staff > 0 &&
           b.staff <= b.level * 5 &&
           Number.isFinite(b.inventory) &&
-          b.inventory >= 0,
+          b.inventory >= 0 &&
+          (b.inventoryCost === undefined ||
+            (Number.isFinite(b.inventoryCost) &&
+              b.inventoryCost >= 0 &&
+              (b.inventory > 0 || b.inventoryCost === 0))),
       ) &&
       Array.isArray(s.prices) &&
       s.prices.length === 5 &&

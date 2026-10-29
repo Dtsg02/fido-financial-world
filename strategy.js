@@ -1,6 +1,6 @@
-import { invoicePolicy } from "./commerce.js?v=5183cae63dc0";
-import { ensureLate, regionFor } from "./late.js?v=5183cae63dc0";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=5183cae63dc0";
+import { invoicePolicy } from "./commerce.js?v=14dae22974bb";
+import { ensureLate, regionFor } from "./late.js?v=14dae22974bb";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=14dae22974bb";
 import {
   CITIES,
   SUPPLIERS,
@@ -14,7 +14,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js?v=5183cae63dc0";
+} from "./world.js?v=14dae22974bb";
 export const strategyPages = [
   "World",
   "Operations",

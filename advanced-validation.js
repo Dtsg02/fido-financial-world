@@ -1,9 +1,9 @@
-import { DECISIONS } from "./decisions.js?v=5183cae63dc0";
-import { FACILITY_MODULES } from "./facilities.js?v=5183cae63dc0";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=5183cae63dc0";
-import { TYPES } from "./catalog.js?v=5183cae63dc0";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=5183cae63dc0";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=5183cae63dc0";
+import { DECISIONS } from "./decisions.js?v=14dae22974bb";
+import { FACILITY_MODULES } from "./facilities.js?v=14dae22974bb";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=14dae22974bb";
+import { TYPES } from "./catalog.js?v=14dae22974bb";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=14dae22974bb";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=14dae22974bb";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;
@@ -47,6 +47,72 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    if (
+      s.empire?.warehouseCost &&
+      (!Array.isArray(s.empire.warehouseCost) ||
+        s.empire.warehouseCost.length !== 4 ||
+        !s.empire.warehouseCost.every((v) => n(v)))
+    )
+      return false;
+    if (
+      s.businesses?.some(
+        (b) =>
+          b.purchasing &&
+          (!obj(b.purchasing) ||
+            !n(b.purchasing.buffer, 0, 3) ||
+            !n(b.purchasing.reserve, 0, 1e12) ||
+            !i(b.purchasing.batch, 1, 10000)),
+      )
+    )
+      return false;
+    if (
+      s.taxOffice &&
+      (!obj(s.taxOffice) ||
+        !n(s.taxOffice.payable) ||
+        !n(s.taxOffice.totalPaid) ||
+        !n(s.taxOffice.expired) ||
+        !arr(
+          s.taxOffice.losses,
+          (l) => obj(l) && n(l.amount) && i(l.expires),
+          120,
+        ) ||
+        !arr(
+          s.taxOffice.history,
+          (r) =>
+            obj(r) &&
+            i(r.month) &&
+            n(r.income, -1e18, 1e18) &&
+            ["offset", "taxable", "rate", "provision", "paid", "expired"].every(
+              (k) => n(r[k]),
+            ),
+          120,
+        ))
+    )
+      return false;
+    if (
+      s.accounts &&
+      (!obj(s.accounts) ||
+        !arr(
+          s.accounts.history,
+          (r) =>
+            obj(r) &&
+            i(r.month) &&
+            [
+              "openingCash",
+              "closingCash",
+              "cashChange",
+              "profit",
+              "revenue",
+              "cogs",
+              "writeoffs",
+              "overhead",
+              "gross",
+              "workingCapital",
+            ].every((k) => n(r[k], -1e18, 1e18)),
+          120,
+        ))
+    )
+      return false;
     if (s.bondMarket) {
       const m = s.bondMarket;
       if (

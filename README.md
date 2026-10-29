@@ -37,7 +37,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - Four supply houses with different fixed prices, reliability, collateral requirements, and credit terms. Agreements run 6/12/24 months with monthly standing orders, credit limits, delivery suspensions, arrears fees, expiry, and early termination.
 - Internal production routes connect complementary businesses. B2B contracts take capacity first, then internal shipments, then retail sales. Routes consume inventory, charge freight, and arrive next month.
 - Customer underwriting sets the price and payment risk of new B2B contracts. Late invoices enter collection; third missed attempts default with partial recovery. Factoring exchanges future collections for immediate cash at a fee.
-- Six-month commitment calendars separate existing supplier liabilities from future orders and construction installments.
+- Six-month commitment calendars separate supplier liabilities, future orders, construction installments, amortizing loans, coupons and bullet maturities. Twelve-month liquidity drills compare three invoice-collection outcomes.
 - Facility equipment, utilities, workforce, and storage create distinct bottlenecks. Four ten-level upgrade tracks have construction periods, staged funding, funding pauses, and salvage values. Shift patterns trade output against payroll, morale, and wear.
 - Fifteen contextual quarterly situations provide 45 choices, with temporary effects and delayed outcomes. Pending decisions are preserved until resolved; recent situations are excluded from the next selection.
 
@@ -49,6 +49,9 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - Properties with condition, tenant strategies, vacancy, upkeep, maintenance reserves, and multi-month development.
 
 ### Finance
+
+- Accounts desk with company gross margins, weighted-average cost of sales, inventory write-offs, invoice aging, working capital, cash/profit reconciliation and 120 monthly closing records. A tax office tracks loss vintages, expiry, relief used, quarterly payments and tax payable.
+- Purchasing mandates set 0–3 extra months of buffer stock, cash floors and order batches, constrained by physical storage.
 
 - Five fictional market assets, dividends, limit orders, collateralized short positions, margin checks, and bought cash-settled calls/puts.
 - Four foreign currencies, conversion fees, and reserve holdings.
@@ -72,12 +75,12 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 - Months advance only when requested. A pending quarterly decision stops automatic quarterly advancement.
 - Group cash and consolidated net worth are distinct from founder distributions. Issuing shares dilutes founder ownership, but group net worth continues to show the full consolidated group.
-- Net worth uses business resale values, inventory at base material cost, active refundable contract deposits, invoices, property resale values, warehouse market values, shipments at material cost, currency reserves, short equity, option intrinsic value, franchise carrying value, discounted venture stakes, bank equity, and infrastructure/HQ carrying values, minus debt.
+- Net worth uses business resale values, inventory at weighted-average acquisition cost, active refundable contract deposits, invoices, property resale values, warehouse and shipment acquisition costs including freight, currency reserves, short equity, option intrinsic value, franchise carrying value, discounted venture stakes, bank equity, and infrastructure/HQ carrying values, minus debt.
 - Option premium is expensed from cash when purchased; headline net worth excludes option time value. Options are held to expiry. Limit orders execute at monthly closing prices only. Short losses may exceed opening collateral after a price gap.
-- Procurement cash is paid before sales. Contract invoices can create taxable profit before the cash arrives. Taxes start at 20% of positive modeled taxable income and change with policy; there are no loss carryforwards or comprehensive capital-gains taxes.
+- Procurement cash is paid before sales. Contract invoices can create taxable profit before the cash arrives. Taxes start at 20% of positive modeled taxable income and change with policy; losses carry forward for 120 months and offset up to 80% of positive monthly taxable income. Tax provisions accrue monthly and settle every third simulation month. Unpaid accrued tax reduces net worth; comprehensive capital-gains taxes are not modeled.
 - Bank customer deposits are liabilities on the bank’s segregated balance sheet, not spendable group capital. Bank earnings enter the group result; transferring equity between bank and group does not create wealth.
-- Supply collateral, internal shipments, facility salvage, supplier payables, and corporate bonds enter modeled net worth. Supplier purchase-price differences from modeled material cost are recognized as current-period operating adjustments. Trade-credit principal payments are cash movements, not a second operating expense.
-- Facility construction is carried at 40% of funds paid and completed upgrades at 50% of investment. Internal transfers use 90% of material value plus a 2.5% freight cost, not a physical bill of materials. Factoring fees, cancellation fees, equity swaps, and issuance costs affect cash/net worth when actioned; they are not a comprehensive accrual ledger.
+- Supply collateral, internal shipments, facility salvage, supplier payables, and corporate bonds enter modeled net worth. Actual procurement costs remain in inventory until consumption. Internal routes transfer acquisition costs and capitalize freight; spoilage and overflow write off recorded cost. Legacy stock receives a one-time catalog-cost opening basis. Trade-credit principal payments are cash movements, not a second operating expense.
+- Facility construction is carried at 40% of funds paid and completed upgrades at 50% of investment. Internal transfers use 90% of current material value to determine physical yield, with 2.5% freight capitalized into output acquisition cost; this is not a physical bill of materials. Factoring fees, cancellation fees, equity swaps, and issuance costs affect cash/net worth when actioned; they are not a comprehensive accrual ledger.
 - Corporate coupons reduce monthly group profit whether paid or capitalized. Bond maturity failures remain corporate liabilities rather than silently turning into bank loans. Restructuring exchanges debt for 20% cash and 80% outside equity, with no claim of a professional valuation model.
 - Some journals summarize profit rather than logging every cash movement. Cash flow can differ from reported net profit.
 - Emergency credit prevents a forced game over. This is an open-ended sandbox; sustained losses increase debt rather than deleting your world.
@@ -86,7 +89,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 90 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 106 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -98,6 +101,7 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 
 ## Source structure
 
+- `dist/inventory.js`, `accounts.js`, `accounts-ui.js`: stock basis, purchasing mandates, management statements and liquidity drills.
 - `dist/catalog.js`: industry definitions and sector characteristics.
 - `dist/commerce.js`, `commerce-ui.js`: supply agreements, trade credit, internal production routes, customer risk, factoring, and commitments.
 - `dist/facilities.js`, `facility-ui.js`: physical bottlenecks, construction, shifts, maintenance, and storage.

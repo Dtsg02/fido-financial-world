@@ -1,4 +1,5 @@
-import { TYPES } from "./catalog.js?v=5183cae63dc0";
+import { consumeStock } from "./inventory.js?v=14dae22974bb";
+import { TYPES } from "./catalog.js?v=14dae22974bb";
 export const FACILITY_MODULES = [
   {
     id: "equipment",
@@ -168,7 +169,7 @@ export function enforceStorage(b, unit) {
     limit = facilityLimits(b, 0).storage;
   f.overflow = Math.max(0, b.inventory - limit);
   if (!f.overflow) return 0;
-  b.inventory -= f.overflow;
+  const cost = consumeStock(b, f.overflow);
   f.report = `Storage overflow: ${f.overflow} input units written off. Reduce orders or expand storage.`;
-  return f.overflow * unit;
+  return cost;
 }
