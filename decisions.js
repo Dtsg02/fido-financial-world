@@ -1,7 +1,7 @@
-import { consumeStock } from "./inventory.js?v=8218e214890d";
-import { TYPES } from "./catalog.js?v=8218e214890d";
-import { facility, facilityLimits } from "./facilities.js?v=8218e214890d";
-import { sectorState } from "./sectors.js?v=8218e214890d";
+import { consumeStock } from "./inventory.js?v=4ae5ac115653";
+import { TYPES } from "./catalog.js?v=4ae5ac115653";
+import { facility, facilityLimits } from "./facilities.js?v=4ae5ac115653";
+import { sectorState } from "./sectors.js?v=4ae5ac115653";
 const choice = (label, cost, effects, desc, later) => ({
   label,
   cost,

@@ -1,4 +1,4 @@
-import { deals, INTEGRATION_PLANS, settleSellerNote } from "./acquisitions.js?v=8218e214890d";
+import { deals, INTEGRATION_PLANS, settleSellerNote } from "./acquisitions.js?v=4ae5ac115653";
 export function integrationContent(s, { money, esc, btn }) {
   const d = deals(s);
   return `<section class="card industry-card"><h2>Acquisition integration desk</h2><p>Buying a company starts a transition. Integration consumes cash and temporarily disrupts demand and workforce capacity. Unfunded or paused months make no progress and reduce morale by 2 points. Seller notes must be repaid even if the acquisition struggles.</p><div class="catalog">${

@@ -1,5 +1,5 @@
-import { recipeContent } from "./recipe-ui.js?v=8218e214890d";
-import { warehouseValues } from "./inventory.js?v=8218e214890d";
+import { recipeContent } from "./recipe-ui.js?v=4ae5ac115653";
+import { warehouseValues } from "./inventory.js?v=4ae5ac115653";
 import {
   TYPES,
   ASSETS,
@@ -9,8 +9,8 @@ import {
   advance,
   resolve,
   log,
-} from "./engine.js?v=8218e214890d";
-import { INDUSTRY } from "./catalog.js?v=8218e214890d";
+} from "./engine.js?v=4ae5ac115653";
+import { INDUSTRY } from "./catalog.js?v=4ae5ac115653";
 import {
   COMMODITIES,
   CITIES,
@@ -18,7 +18,7 @@ import {
   productivity,
   materialFactor,
   demandFactor,
-} from "./world.js?v=8218e214890d";
+} from "./world.js?v=4ae5ac115653";
 import {
   ROLES,
   FX,
@@ -48,7 +48,7 @@ import {
   customerMultiplier,
   deepMaterial,
   deepCapacity,
-} from "./empire.js?v=8218e214890d";
+} from "./empire.js?v=4ae5ac115653";
 export const expansionPages = [
   "Supply",
   "Talent",

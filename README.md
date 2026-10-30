@@ -20,6 +20,8 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 
 ## Game systems
 
+- **Procurement treasury:** optional company cash reserves, manual transfers, monthly funding targets, parent cash floors and proportional allocation under scarcity. Reserved cash remains a group asset but is unavailable to parent obligations until withdrawn. These budgets govern automatic spot purchases; payroll, signed supplier agreements and other flows remain centralized.
+
 ### Build and operate
 
 - **24 industries:** cafés, creative services, e-commerce, software, manufacturing, solar, bakeries, restaurants, farming, logistics, hotels, clinics, education, publishing, construction, semiconductors, data centers, recycling, biotech, consulting, telecom, games, cybersecurity, and water utilities.
@@ -93,7 +95,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 140 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 145 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 

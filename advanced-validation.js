@@ -1,13 +1,13 @@
-import { BATCH_METHODS } from "./production.js?v=8218e214890d";
-import { RECIPES } from "./recipes.js?v=8218e214890d";
-import { RECRUITMENT } from "./workforce.js?v=8218e214890d";
-import { INTEGRATION_PLANS } from "./acquisitions.js?v=8218e214890d";
-import { DECISIONS } from "./decisions.js?v=8218e214890d";
-import { FACILITY_MODULES } from "./facilities.js?v=8218e214890d";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=8218e214890d";
-import { TYPES } from "./catalog.js?v=8218e214890d";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=8218e214890d";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=8218e214890d";
+import { BATCH_METHODS } from "./production.js?v=4ae5ac115653";
+import { RECIPES } from "./recipes.js?v=4ae5ac115653";
+import { RECRUITMENT } from "./workforce.js?v=4ae5ac115653";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=4ae5ac115653";
+import { DECISIONS } from "./decisions.js?v=4ae5ac115653";
+import { FACILITY_MODULES } from "./facilities.js?v=4ae5ac115653";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=4ae5ac115653";
+import { TYPES } from "./catalog.js?v=4ae5ac115653";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=4ae5ac115653";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=4ae5ac115653";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;
@@ -51,6 +51,7 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    if (s.businesses?.some(b => b.treasury !== undefined && (!obj(b.treasury) || typeof b.treasury.enabled !== "boolean" || typeof b.treasury.automatic !== "boolean" || !n(b.treasury.cash) || !n(b.treasury.target, 0, 1e12) || !n(b.treasury.floor, 0, 1e12) || !n(b.treasury.funded) || !n(b.treasury.spent)))) return false;
     if (
       s.businesses?.some((b) => {
         const p = b.production;

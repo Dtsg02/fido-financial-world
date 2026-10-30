@@ -1,6 +1,7 @@
-import { workInProgress } from "./production.js?v=8218e214890d";
-import { stockValue, warehouseValues } from "./inventory.js?v=8218e214890d";
-import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=8218e214890d";
+import { procurementCash, reservedCash } from "./treasury.js?v=4ae5ac115653";
+import { workInProgress } from "./production.js?v=4ae5ac115653";
+import { stockValue, warehouseValues } from "./inventory.js?v=4ae5ac115653";
+import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=4ae5ac115653";
 export function purchasing(b) {
   return (b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 });
 }
@@ -31,7 +32,7 @@ export function purchasePlan(s, b, target, unit, storage) {
       Math.min(
         lots,
         Math.max(0, storage - b.inventory),
-        Math.max(0, s.cash - p.reserve) / unit,
+        Math.max(0, procurementCash(s, b) - (b.treasury?.enabled ? 0 : p.reserve)) / unit,
       ) / p.batch,
     ) * p.batch,
   );
@@ -72,6 +73,7 @@ export function closeAccounts(s, openingCash) {
     month: s.month,
     openingCash,
     closingCash: s.cash,
+    procurementReserves: reservedCash(s),
     cashChange: s.cash - openingCash,
     profit: s.profit,
     revenue: sum("revenue"),

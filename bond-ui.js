@@ -6,8 +6,8 @@ import {
   issueBond,
   repayBond,
   restructureBond,
-} from "./bonds.js?v=8218e214890d";
-import { worth } from "./engine.js?v=8218e214890d";
+} from "./bonds.js?v=4ae5ac115653";
+import { worth } from "./engine.js?v=4ae5ac115653";
 export function bondContent(s, h) {
   const m = bondMarket(s),
     nw = worth(s),

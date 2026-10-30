@@ -7,8 +7,8 @@ import {
   setProductionAllocation,
   cancelBatch,
   expediteBatch,
-} from "./production.js?v=8218e214890d";
-import { COMMODITIES } from "./world.js?v=8218e214890d";
+} from "./production.js?v=4ae5ac115653";
+import { COMMODITIES } from "./world.js?v=4ae5ac115653";
 export function productionContent(s, h) {
   const { heading, money, esc, btn, stat } = h,
     companies = s.businesses.filter(

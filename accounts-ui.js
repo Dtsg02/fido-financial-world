@@ -1,11 +1,12 @@
-import { taxOffice, nextTaxMonth } from "./tax.js?v=8218e214890d";
+import { treasury, reservedCash, setTreasury, transferCash } from "./treasury.js?v=4ae5ac115653";
+import { taxOffice, nextTaxMonth } from "./tax.js?v=4ae5ac115653";
 import {
   workingCapital,
   purchasing,
   setPurchasing,
   liquidityDrill,
-} from "./accounts.js?v=8218e214890d";
-import { stockValue } from "./inventory.js?v=8218e214890d";
+} from "./accounts.js?v=4ae5ac115653";
+import { stockValue } from "./inventory.js?v=4ae5ac115653";
 export function accountsContent(s, h) {
   const { heading, money, esc, btn, stat } = h,
     w = workingCapital(s);
@@ -32,6 +33,7 @@ export function accountsContent(s, h) {
       })
       .join("") || "<p>Start a business to create purchasing mandates.</p>"
   }</div></section>
+  <section class="card industry-card"><h2>Procurement treasury</h2><p>Earmark cash for each company's automatic spot purchases. Reserved funds cannot pay parent obligations. Sales, payroll, signed supply agreements, manual purchases and other costs remain in parent cash. These are internal budgets, not separate legal bank accounts.</p>${row("Parent spendable cash", s.cash)}${row("Reserved procurement cash", reservedCash(s))}<p>Automatic funding runs after monthly commitments, before spot purchasing. When funds are scarce, all enabled automatic budgets share available cash proportionally, respecting the highest parent cash floor. Disabling a budget does not release its cash; withdraw it explicitly.</p><div class="catalog">${s.businesses.map(b => { const t = treasury(b); return `<section class="product-row"><h3>${esc(b.name)}</h3>${row("Reserved cash", t.cash)}${row("Funded this month", t.funded)}${row("Spot purchases this month", t.spent)}<label class="field">Purchasing source<select id="treasury-mode-${b.id}"><option value="parent" ${!t.enabled ? "selected" : ""}>Parent cash</option><option value="manual" ${t.enabled && !t.automatic ? "selected" : ""}>Reserved cash · manual funding</option><option value="auto" ${t.enabled && t.automatic ? "selected" : ""}>Reserved cash · monthly top-up</option></select></label><label class="field">Monthly cash target<input id="treasury-target-${b.id}" type="number" min="0" value="${t.target}"></label><label class="field">Parent cash floor<input id="treasury-floor-${b.id}" type="number" min="0" value="${t.floor}"></label>${btn("Save treasury policy", "accounts:treasury:" + b.id)}<label class="field">Transfer amount<input id="treasury-transfer-${b.id}" type="number" min="1" value="1000"></label>${btn("Fund reserve", "accounts:fund:" + b.id)}${btn("Withdraw to parent", "accounts:withdraw:" + b.id)}<p class="explain">An empty enabled reserve stops automatic spot purchases even if the parent is rich. Existing stock and warehouse production remain usable. Cash transfers create no profit. The spot-purchasing group reserve above applies only when buying from parent cash.</p></section>`; }).join("")}</div></section>
   <section class="card industry-card"><h2>Tax office</h2><p>Fictional group tax rules: losses carry forward for 120 months and can offset up to 80% of a profitable month's taxable income. Oldest losses are used first. No cash refund is created by a loss. Tax accrues monthly and is paid automatically every third simulation month; outstanding tax reduces net worth.</p><div class="detail-grid"><div>${row("Tax payable", tax.payable)}${row(
     "Losses available to carry forward",
     tax.losses.reduce((n, l) => n + l.amount, 0),
@@ -70,6 +72,18 @@ export function accountsAction(parts, s, h) {
   const b = s.businesses.find((b) => b.id === Number(parts[2]));
   if (!b) return;
   const read = (id) => Number(document.getElementById(`${id}-${b.id}`).value);
+  if (parts[1] === "treasury") {
+    const mode = document.getElementById(`treasury-mode-${b.id}`).value;
+    if (setTreasury(b, mode !== "parent", mode === "auto", read("treasury-target"), read("treasury-floor"))) h.changed("Treasury policy saved.");
+    else h.toast("Enter cash targets and floors between zero and one trillion.");
+    return;
+  }
+  if (["fund", "withdraw"].includes(parts[1])) {
+    const amount = read("treasury-transfer");
+    if (amount > 0 && transferCash(s, b, amount * (parts[1] === "fund" ? 1 : -1))) h.changed("Cash transferred without changing group profit.");
+    else h.toast("Enter a positive amount covered by the source cash balance.");
+    return;
+  }
   if (setPurchasing(b, read("buffer"), read("reserve"), read("batch")))
     h.changed("Purchasing mandate saved.");
   else

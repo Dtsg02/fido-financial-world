@@ -1,35 +1,36 @@
-import { productionContent, productionAction } from "./production-ui.js?v=8218e214890d";
-import { workInProgress } from "./production.js?v=8218e214890d";
-import { recipeAction } from "./recipe-ui.js?v=8218e214890d";
+import { reservedCash } from "./treasury.js?v=4ae5ac115653";
+import { productionContent, productionAction } from "./production-ui.js?v=4ae5ac115653";
+import { workInProgress } from "./production.js?v=4ae5ac115653";
+import { recipeAction } from "./recipe-ui.js?v=4ae5ac115653";
 import {
   plannedStaff,
   staffingQuote,
   setStaffing,
   hiringControls,
-} from "./workforce.js?v=8218e214890d";
-import { sellerDebt } from "./acquisitions.js?v=8218e214890d";
-import { taxLiability } from "./tax.js?v=8218e214890d";
-import { bondDebt } from "./bonds.js?v=8218e214890d";
-import { commercialAssets } from "./commerce.js?v=8218e214890d";
-import { integrationAction } from "./acquisition-ui.js?v=8218e214890d";
-import { accountsContent, accountsAction } from "./accounts-ui.js?v=8218e214890d";
-import { stockValue, receiveStock } from "./inventory.js?v=8218e214890d";
-import { bondContent, bondAction } from "./bond-ui.js?v=8218e214890d";
-import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=8218e214890d";
-import { facilityContent, facilityAction } from "./facility-ui.js?v=8218e214890d";
-import { facilityAssets } from "./facilities.js?v=8218e214890d";
-import { commerceContent, commerceAction } from "./commerce-ui.js?v=8218e214890d";
-import { industryContent, industryAction } from "./industry-ui.js?v=8218e214890d";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=8218e214890d";
-import { ensureLate, lateAssets } from "./late.js?v=8218e214890d";
+} from "./workforce.js?v=4ae5ac115653";
+import { sellerDebt } from "./acquisitions.js?v=4ae5ac115653";
+import { taxLiability } from "./tax.js?v=4ae5ac115653";
+import { bondDebt } from "./bonds.js?v=4ae5ac115653";
+import { commercialAssets } from "./commerce.js?v=4ae5ac115653";
+import { integrationAction } from "./acquisition-ui.js?v=4ae5ac115653";
+import { accountsContent, accountsAction } from "./accounts-ui.js?v=4ae5ac115653";
+import { stockValue, receiveStock } from "./inventory.js?v=4ae5ac115653";
+import { bondContent, bondAction } from "./bond-ui.js?v=4ae5ac115653";
+import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=4ae5ac115653";
+import { facilityContent, facilityAction } from "./facility-ui.js?v=4ae5ac115653";
+import { facilityAssets } from "./facilities.js?v=4ae5ac115653";
+import { commerceContent, commerceAction } from "./commerce-ui.js?v=4ae5ac115653";
+import { industryContent, industryAction } from "./industry-ui.js?v=4ae5ac115653";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=4ae5ac115653";
+import { ensureLate, lateAssets } from "./late.js?v=4ae5ac115653";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js?v=8218e214890d";
-import { ensureEmpire, additionalAssets } from "./empire.js?v=8218e214890d";
-import { ensureWorld, canSell, city } from "./world.js?v=8218e214890d";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=8218e214890d";
+} from "./expansion.js?v=4ae5ac115653";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=4ae5ac115653";
+import { ensureWorld, canSell, city } from "./world.js?v=4ae5ac115653";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=4ae5ac115653";
 import {
   TYPES,
   ASSETS,
@@ -45,7 +46,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js?v=8218e214890d";
+} from "./engine.js?v=4ae5ac115653";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {
@@ -351,7 +352,7 @@ function banking() {
       "Give your ambitions some runway.",
       "Debt can accelerate growth. Interest can slow it down.",
     ) +
-    `<div class="stats">${stat("Cash", money(s.cash), "Your liquid capital", "wallet")}${stat("Outstanding debt", money(s.debt), "Interest charged monthly", "Banking")}${stat("Annual interest rate", (s.rate * 100).toFixed(1) + "%", "Variable, follows the economy", "Markets")}${stat("Available credit", money(available), "Based on current net worth", "Properties")}</div><div class="detail-grid"><section class="card"><h2>Your credit line</h2><p class="explain">Borrow up to the greater of $25,000 or 50% of your net worth, minus existing debt. No fixed repayment schedule. Emergency credit may exceed this limit if cash runs out.</p><label class="field">Amount in dollars<input id="loanAmount" type="number" min="1" step="100" value="5000"></label><div class="actions">${btn("Borrow funds", "borrow", "", available < 1)}${btn("Repay debt", "repay", "light", s.debt <= 0)}</div><p class="explain">Current interest payment: ${money((s.debt * s.rate) / 12)} per month. Unused cash earns no interest.</p></section><section class="card"><h2>Your balance sheet</h2><div class="balance-line"><span>Cash</span><b>${money(s.cash)}</b></div><div class="balance-line"><span>Businesses & facilities (resale value)</span><b>${money(s.businesses.reduce((n, b) => n + type(b).cost * b.level * 0.75 + facilityAssets(b), 0))}</b></div><div class="balance-line"><span>Stock portfolio</span><b>${money(s.prices.reduce((n, p, i) => n + p * (s.holdings[i] || 0), 0))}</b></div><div class="balance-line"><span>Real estate</span><b>${money(s.properties.reduce((n, p) => n + PROPERTIES[p.kind].cost * p.factor * (1 + ((p.level || 1) - 1) * 0.15), 0))}</b></div><div class="balance-line"><span>Inventory (acquisition cost), deposits & invoices</span><b>${money(s.businesses.reduce((n, b) => n + stockValue(b), 0) + s.world.receivables.reduce((n, r) => n + r.amount, 0) + s.world.contracts.filter((c) => c.status === "active").reduce((n, c) => n + c.deposit, 0))}</b></div><div class="balance-line"><span>Warehouse, shipments, FX & advanced assets</span><b>${money(additionalAssets(s))}</b></div><div class="balance-line"><span>Private ventures, bank equity & infrastructure</span><b>${money(lateAssets(s))}</b></div><div class="balance-line"><span>Work in progress</span><b>${money(workInProgress(s))}</b></div><div class="balance-line"><span>Trade assets less supplier payables</span><b>${money(commercialAssets(s))}</b></div><div class="balance-line"><span>Bank debt</span><b>−${money(s.debt)}</b></div><div class="balance-line"><span>Corporate bonds</span><b>−${money(bondDebt(s))}</b></div><div class="balance-line"><span>Seller financing</span><b>−${money(sellerDebt(s))}</b></div><div class="balance-line"><span>Accrued tax payable</span><b>−${money(taxLiability(s))}</b></div><div class="balance-line total"><span>Net worth</span><b>${money(worth(s))}</b></div></section></div>`
+    `<div class="stats">${stat("Cash", money(s.cash), "Your liquid capital", "wallet")}${stat("Outstanding debt", money(s.debt), "Interest charged monthly", "Banking")}${stat("Annual interest rate", (s.rate * 100).toFixed(1) + "%", "Variable, follows the economy", "Markets")}${stat("Available credit", money(available), "Based on current net worth", "Properties")}</div><div class="detail-grid"><section class="card"><h2>Your credit line</h2><p class="explain">Borrow up to the greater of $25,000 or 50% of your net worth, minus existing debt. No fixed repayment schedule. Emergency credit may exceed this limit if cash runs out.</p><label class="field">Amount in dollars<input id="loanAmount" type="number" min="1" step="100" value="5000"></label><div class="actions">${btn("Borrow funds", "borrow", "", available < 1)}${btn("Repay debt", "repay", "light", s.debt <= 0)}</div><p class="explain">Current interest payment: ${money((s.debt * s.rate) / 12)} per month. Unused cash earns no interest.</p></section><section class="card"><h2>Your balance sheet</h2><div class="balance-line"><span>Parent cash</span><b>${money(s.cash)}</b></div><div class="balance-line"><span>Reserved procurement cash</span><b>${money(reservedCash(s))}</b></div><div class="balance-line"><span>Businesses & facilities (resale value)</span><b>${money(s.businesses.reduce((n, b) => n + type(b).cost * b.level * 0.75 + facilityAssets(b), 0))}</b></div><div class="balance-line"><span>Stock portfolio</span><b>${money(s.prices.reduce((n, p, i) => n + p * (s.holdings[i] || 0), 0))}</b></div><div class="balance-line"><span>Real estate</span><b>${money(s.properties.reduce((n, p) => n + PROPERTIES[p.kind].cost * p.factor * (1 + ((p.level || 1) - 1) * 0.15), 0))}</b></div><div class="balance-line"><span>Inventory (acquisition cost), deposits & invoices</span><b>${money(s.businesses.reduce((n, b) => n + stockValue(b), 0) + s.world.receivables.reduce((n, r) => n + r.amount, 0) + s.world.contracts.filter((c) => c.status === "active").reduce((n, c) => n + c.deposit, 0))}</b></div><div class="balance-line"><span>Warehouse, shipments, FX & advanced assets</span><b>${money(additionalAssets(s))}</b></div><div class="balance-line"><span>Private ventures, bank equity & infrastructure</span><b>${money(lateAssets(s))}</b></div><div class="balance-line"><span>Work in progress</span><b>${money(workInProgress(s))}</b></div><div class="balance-line"><span>Trade assets less supplier payables</span><b>${money(commercialAssets(s))}</b></div><div class="balance-line"><span>Bank debt</span><b>−${money(s.debt)}</b></div><div class="balance-line"><span>Corporate bonds</span><b>−${money(bondDebt(s))}</b></div><div class="balance-line"><span>Seller financing</span><b>−${money(sellerDebt(s))}</b></div><div class="balance-line"><span>Accrued tax payable</span><b>−${money(taxLiability(s))}</b></div><div class="balance-line total"><span>Net worth</span><b>${money(worth(s))}</b></div></section></div>`
   );
 }
 function research() {
@@ -666,7 +667,7 @@ document.addEventListener("click", (e) => {
         );
       let value =
         type(b).cost * b.level * 0.75 + stockValue(b) + facilityAssets(b);
-      s.cash += value;
+      s.cash += value + (b.treasury?.cash || 0);
       s.businesses = s.businesses.filter((x) => x !== b);
       log(s, "Sold " + b.name, value);
       selected = null;

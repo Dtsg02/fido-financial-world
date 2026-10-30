@@ -1,4 +1,4 @@
-import { TYPES } from "./catalog.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=4ae5ac115653";
 export const RECRUITMENT = {
   standard: {
     name: "Open recruitment",
