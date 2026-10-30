@@ -1,11 +1,12 @@
-import { RECRUITMENT } from "./workforce.js?v=50124d33bf5b";
-import { INTEGRATION_PLANS } from "./acquisitions.js?v=50124d33bf5b";
-import { DECISIONS } from "./decisions.js?v=50124d33bf5b";
-import { FACILITY_MODULES } from "./facilities.js?v=50124d33bf5b";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=50124d33bf5b";
-import { TYPES } from "./catalog.js?v=50124d33bf5b";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=50124d33bf5b";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=50124d33bf5b";
+import { RECIPES } from "./recipes.js?v=830bc158a7cf";
+import { RECRUITMENT } from "./workforce.js?v=830bc158a7cf";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=830bc158a7cf";
+import { DECISIONS } from "./decisions.js?v=830bc158a7cf";
+import { FACILITY_MODULES } from "./facilities.js?v=830bc158a7cf";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=830bc158a7cf";
+import { TYPES } from "./catalog.js?v=830bc158a7cf";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=830bc158a7cf";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=830bc158a7cf";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;
@@ -49,6 +50,25 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    if (
+      s.businesses?.some((b) => {
+        const r = b.recipe;
+        return (
+          r &&
+          (!obj(r) ||
+            !Object.hasOwn(RECIPES, b.type) ||
+            typeof r.installed !== "boolean" ||
+            typeof r.enabled !== "boolean" ||
+            !i(r.remaining, 0, 2) ||
+            !n(r.invested) ||
+            !i(r.lastProduced) ||
+            !n(r.lastCost) ||
+            (r.installed && r.remaining > 0) ||
+            (r.enabled && !r.installed))
+        );
+      })
+    )
+      return false;
     if (
       s.businesses?.some((b) => {
         const w = b.workforce;

@@ -5,8 +5,8 @@ import {
   buildFacility,
   cancelFacility,
   facilityOverhead,
-} from "./facilities.js?v=50124d33bf5b";
-import { forecast } from "./engine.js?v=50124d33bf5b";
+} from "./facilities.js?v=830bc158a7cf";
+import { forecast } from "./engine.js?v=830bc158a7cf";
 export function facilityContent(s, h) {
   const { heading, btn, money, esc } = h;
   return (

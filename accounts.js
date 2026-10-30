@@ -1,5 +1,5 @@
-import { stockValue, warehouseValues } from "./inventory.js?v=50124d33bf5b";
-import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=50124d33bf5b";
+import { stockValue, warehouseValues } from "./inventory.js?v=830bc158a7cf";
+import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=830bc158a7cf";
 export function purchasing(b) {
   return (b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 });
 }

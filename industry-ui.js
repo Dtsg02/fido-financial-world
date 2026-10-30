@@ -9,8 +9,8 @@ import {
   refreshProduct,
   retireProduct,
   upgradeSector,
-} from "./sectors.js?v=50124d33bf5b";
-import { TYPES, forecast } from "./engine.js?v=50124d33bf5b";
+} from "./sectors.js?v=830bc158a7cf";
+import { TYPES, forecast } from "./engine.js?v=830bc158a7cf";
 export function industryContent(s, h) {
   const { heading, btn, money, esc, stat } = h;
   return (

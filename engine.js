@@ -1,25 +1,27 @@
-import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=50124d33bf5b";
+import { beforeRecipeMonth, recipeOverhead } from "./recipes.js?v=830bc158a7cf";
+import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=830bc158a7cf";
 import {
   beforeAcquisitionMonth,
   integrationEffects,
+  integrationBudget,
   sellerDebt,
   deals,
-} from "./acquisitions.js?v=50124d33bf5b";
-import { taxClose, taxLiability } from "./tax.js?v=50124d33bf5b";
-import { purchasePlan, closeAccounts } from "./accounts.js?v=50124d33bf5b";
+} from "./acquisitions.js?v=830bc158a7cf";
+import { taxClose, taxLiability } from "./tax.js?v=830bc158a7cf";
+import { purchasePlan, closeAccounts } from "./accounts.js?v=830bc158a7cf";
 import {
   stockValue,
   receiveStock,
   consumeStock,
   warehouseValues,
-} from "./inventory.js?v=50124d33bf5b";
-import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=50124d33bf5b";
+} from "./inventory.js?v=830bc158a7cf";
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=830bc158a7cf";
 import {
   generateDecision,
   beforeDecisionMonth,
   decisionModifiers,
   resolveDecision,
-} from "./decisions.js?v=50124d33bf5b";
+} from "./decisions.js?v=830bc158a7cf";
 import {
   facility,
   facilityAssets,
@@ -27,7 +29,7 @@ import {
   facilityOverhead,
   beforeFacilityMonth,
   enforceStorage,
-} from "./facilities.js?v=50124d33bf5b";
+} from "./facilities.js?v=830bc158a7cf";
 import {
   commerce,
   commercialAssets,
@@ -35,14 +37,14 @@ import {
   beforeCommerceMonth,
   procureSupply,
   routeProduction,
-} from "./commerce.js?v=50124d33bf5b";
+} from "./commerce.js?v=830bc158a7cf";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=50124d33bf5b";
-import { validateAdvanced } from "./advanced-validation.js?v=50124d33bf5b";
+} from "./sectors.js?v=830bc158a7cf";
+import { validateAdvanced } from "./advanced-validation.js?v=830bc158a7cf";
 import {
   ensureLate,
   internationalDemand,
@@ -52,7 +54,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=50124d33bf5b";
+} from "./late.js?v=830bc158a7cf";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -65,8 +67,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=50124d33bf5b";
-import { validateExtra } from "./validation.js?v=50124d33bf5b";
+} from "./empire.js?v=830bc158a7cf";
+import { validateExtra } from "./validation.js?v=830bc158a7cf";
 import {
   ensureWorld,
   initBusiness,
@@ -78,8 +80,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=50124d33bf5b";
-import { TYPES } from "./catalog.js?v=50124d33bf5b";
+} from "./world.js?v=830bc158a7cf";
+import { TYPES } from "./catalog.js?v=830bc158a7cf";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
@@ -286,6 +288,7 @@ export function forecast(s, b) {
     b.staff * t.wage * s.inflation * c.wages * b.salary * fxFactor(s, b) +
     t.rent * b.level * s.inflation * c.rent * fxFactor(s, b) +
     facilityOverhead(s, b) +
+    recipeOverhead(b) +
     sector.overhead +
     b.marketing +
     companyOverhead(s, b) +
@@ -293,7 +296,7 @@ export function forecast(s, b) {
     b.brandInvestment -
     (completed(s, "ocean") ? s.world.policy.carbon * 0.5 : 0);
   overhead *= integrationEffects(b).overhead;
-  let expense = units * unit + overhead;
+  let expense = units * unit + overhead + integrationBudget(b);
   return {
     facilityPlan,
     salePrice,
@@ -332,6 +335,7 @@ export function advance(s) {
   beforeDecisionMonth(s, rand);
   beforeAcquisitionMonth(s);
   beforeWorkforceMonth(s, rand);
+  beforeRecipeMonth(s);
   let revenue = 0,
     operating = 0;
   let details = [];

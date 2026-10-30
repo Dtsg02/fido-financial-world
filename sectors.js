@@ -1,5 +1,5 @@
-import { consumeStock } from "./inventory.js?v=50124d33bf5b";
-import { TYPES } from "./catalog.js?v=50124d33bf5b";
+import { consumeStock } from "./inventory.js?v=830bc158a7cf";
+import { TYPES } from "./catalog.js?v=830bc158a7cf";
 // Every industry uses one operating model, with persistent state and explicit tradeoffs.
 export const MODELS = {
   subscription: {

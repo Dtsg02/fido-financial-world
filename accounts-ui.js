@@ -1,11 +1,11 @@
-import { taxOffice, nextTaxMonth } from "./tax.js?v=50124d33bf5b";
+import { taxOffice, nextTaxMonth } from "./tax.js?v=830bc158a7cf";
 import {
   workingCapital,
   purchasing,
   setPurchasing,
   liquidityDrill,
-} from "./accounts.js?v=50124d33bf5b";
-import { stockValue } from "./inventory.js?v=50124d33bf5b";
+} from "./accounts.js?v=830bc158a7cf";
+import { stockValue } from "./inventory.js?v=830bc158a7cf";
 export function accountsContent(s, h) {
   const { heading, money, esc, btn, stat } = h,
     w = workingCapital(s);

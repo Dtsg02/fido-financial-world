@@ -1,7 +1,8 @@
-import { commerce } from "./commerce.js?v=50124d33bf5b";
-import { warehouseValues } from "./inventory.js?v=50124d33bf5b";
-import { TYPES, INDUSTRY } from "./catalog.js?v=50124d33bf5b";
-import { rng, ensureWorld, city, supplier, report } from "./world.js?v=50124d33bf5b";
+import { recipeActive, recipeProduction } from "./recipes.js?v=830bc158a7cf";
+import { commerce } from "./commerce.js?v=830bc158a7cf";
+import { warehouseValues } from "./inventory.js?v=830bc158a7cf";
+import { TYPES, INDUSTRY } from "./catalog.js?v=830bc158a7cf";
+import { rng, ensureWorld, city, supplier, report } from "./world.js?v=830bc158a7cf";
 export const ROLES = [
   {
     id: "coo",
@@ -576,6 +577,7 @@ export function orderMaterials(s, index, lots, mode) {
 }
 export function warehouseProduction(s, b, units, unitCost) {
   if (!b.warehouse) return { units: 0, cost: 0 };
+  if (recipeActive(b)) return recipeProduction(s, b, units);
   let i = INDUSTRY[b.type].commodity;
   const basis = warehouseValues(s);
   let lotsPerUnit = unitCost / s.world.commodities[i];

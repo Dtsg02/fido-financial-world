@@ -1,32 +1,33 @@
+import { recipeAction } from "./recipe-ui.js?v=830bc158a7cf";
 import {
   plannedStaff,
   staffingQuote,
   setStaffing,
   hiringControls,
-} from "./workforce.js?v=50124d33bf5b";
-import { sellerDebt } from "./acquisitions.js?v=50124d33bf5b";
-import { taxLiability } from "./tax.js?v=50124d33bf5b";
-import { bondDebt } from "./bonds.js?v=50124d33bf5b";
-import { commercialAssets } from "./commerce.js?v=50124d33bf5b";
-import { integrationAction } from "./acquisition-ui.js?v=50124d33bf5b";
-import { accountsContent, accountsAction } from "./accounts-ui.js?v=50124d33bf5b";
-import { stockValue, receiveStock } from "./inventory.js?v=50124d33bf5b";
-import { bondContent, bondAction } from "./bond-ui.js?v=50124d33bf5b";
-import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=50124d33bf5b";
-import { facilityContent, facilityAction } from "./facility-ui.js?v=50124d33bf5b";
-import { facilityAssets } from "./facilities.js?v=50124d33bf5b";
-import { commerceContent, commerceAction } from "./commerce-ui.js?v=50124d33bf5b";
-import { industryContent, industryAction } from "./industry-ui.js?v=50124d33bf5b";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=50124d33bf5b";
-import { ensureLate, lateAssets } from "./late.js?v=50124d33bf5b";
+} from "./workforce.js?v=830bc158a7cf";
+import { sellerDebt } from "./acquisitions.js?v=830bc158a7cf";
+import { taxLiability } from "./tax.js?v=830bc158a7cf";
+import { bondDebt } from "./bonds.js?v=830bc158a7cf";
+import { commercialAssets } from "./commerce.js?v=830bc158a7cf";
+import { integrationAction } from "./acquisition-ui.js?v=830bc158a7cf";
+import { accountsContent, accountsAction } from "./accounts-ui.js?v=830bc158a7cf";
+import { stockValue, receiveStock } from "./inventory.js?v=830bc158a7cf";
+import { bondContent, bondAction } from "./bond-ui.js?v=830bc158a7cf";
+import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=830bc158a7cf";
+import { facilityContent, facilityAction } from "./facility-ui.js?v=830bc158a7cf";
+import { facilityAssets } from "./facilities.js?v=830bc158a7cf";
+import { commerceContent, commerceAction } from "./commerce-ui.js?v=830bc158a7cf";
+import { industryContent, industryAction } from "./industry-ui.js?v=830bc158a7cf";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=830bc158a7cf";
+import { ensureLate, lateAssets } from "./late.js?v=830bc158a7cf";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js?v=50124d33bf5b";
-import { ensureEmpire, additionalAssets } from "./empire.js?v=50124d33bf5b";
-import { ensureWorld, canSell, city } from "./world.js?v=50124d33bf5b";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=50124d33bf5b";
+} from "./expansion.js?v=830bc158a7cf";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=830bc158a7cf";
+import { ensureWorld, canSell, city } from "./world.js?v=830bc158a7cf";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=830bc158a7cf";
 import {
   TYPES,
   ASSETS,
@@ -42,7 +43,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js?v=50124d33bf5b";
+} from "./engine.js?v=830bc158a7cf";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {
@@ -312,7 +313,7 @@ function manage(b) {
       "Adjust the details. Build a better business.",
       btn("← All businesses", "allbusiness", "light"),
     ) +
-    `<div class="stats">${stat("Revenue / last month", money(b.lastRevenue), b.sold + " units sold", "Markets")}${stat("Operating profit", money(b.lastProfit), "Before personal taxes & interest", "wallet")}${stat("Reputation", Math.round(b.reputation) + "/100", "Fulfill demand to earn loyalty", "Achievements")}${stat("Demand / capacity", f.demand + " / " + f.capacity, "Estimated units this month", "Businesses")}</div><div class="detail-grid"><section class="card"><h2>The operating desk</h2><label class="field">Price per unit · baseline ${money(t.price)}<input id="price" type="number" min="${t.price * 0.25}" max="${t.price * 4}" step="0.01" value="${b.price}"></label><label class="field">Target team size · ${money(t.wage * s.inflation * city(b).wages * b.salary)} per employee / month<input id="staff" type="number" min="1" max="${b.level * 5}" value="${plannedStaff(b)}"></label>${hiringControls(b, esc)}<label class="field">Monthly marketing budget<input id="marketing" type="number" min="0" max="100000" step="100" value="${b.marketing}"></label><label class="field">Product quality<select id="quality">${[1, 2, 3].map((n) => `<option value="${n}" ${b.quality === n ? "selected" : ""}>${["Standard", "Premium (+15% material costs)", "Exceptional (+30% material costs)"][n - 1]}</option>`).join("")}</select></label>${btn("Save operating plan", "plan:" + b.id)}<p class="explain">Demand responds to price, reputation, marketing, the economy, and research. Premium quality raises demand and reputation but costs more to produce. Recruitment takes 1–3 months before candidate acceptance and onboarding. Fees depend on channel; severance costs 35% of a local base monthly wage per employee. Rent: ${money(t.rent * b.level * s.inflation * city(b).rent)}/month. Manage morale, suppliers, and projects in Operations.</p></section><div class="stack"><section class="card"><h2>Next month’s outlook</h2><div class="balance-line"><span>Estimated sales</span><b>${money(f.revenue)}</b></div><div class="balance-line"><span>Materials, wages, rent & marketing</span><b>−${money(f.expense)}</b></div><div class="balance-line total"><span>Operating profit</span><b class="${f.profit >= 0 ? "positive" : "negative"}">${money(f.profit)}</b></div><p class="explain">An estimate, not a guarantee. Demand varies ±15%. ${b.lost ? b.lost + " customers were unserved last month." : ""} Cash is needed to buy materials before sales arrive.</p></section><section class="card"><h2>Inventory & growth</h2><div class="balance-line"><span>Materials in stock</span><b>${b.inventory} units</b></div><label class="field">Purchasing policy<select id="auto" data-business="${b.id}"><option value="yes" ${b.auto ? "selected" : ""}>Automatic · buy for monthly demand</option><option value="no" ${!b.auto ? "selected" : ""}>Manual · use existing inventory only</option></select></label><div class="actions">${btn("Buy 100 units · " + money(f.unit * 100), "stock:" + b.id, "light", s.cash < f.unit * 100)}${btn("Expand · " + money(exp), "expand:" + b.id, "", s.cash < exp || b.level >= 10)}</div><p class="explain">Expansion unlocks 5 more employee slots. It also raises rent; hire staff to use the new capacity. Maximum level 10.</p></section><section class="card"><h2>Exit strategy</h2><p class="explain">Sell the company for ${money(t.cost * b.level * 0.75)} plus inventory at its recorded acquisition cost. This ends its income and expenses.</p><br>${btn("Sell business", "sellbusiness:" + b.id, "danger")}</section></div></div>`
+    `<div class="stats">${stat("Revenue / last month", money(b.lastRevenue), b.sold + " units sold", "Markets")}${stat("Operating profit", money(b.lastProfit), "Before personal taxes & interest", "wallet")}${stat("Reputation", Math.round(b.reputation) + "/100", "Fulfill demand to earn loyalty", "Achievements")}${stat("Demand / capacity", f.demand + " / " + f.capacity, "Estimated units this month", "Businesses")}</div><div class="detail-grid"><section class="card"><h2>The operating desk</h2><label class="field">Price per unit · baseline ${money(t.price)}<input id="price" type="number" min="${t.price * 0.25}" max="${t.price * 4}" step="0.01" value="${b.price}"></label><label class="field">Target team size · ${money(t.wage * s.inflation * city(b).wages * b.salary)} per employee / month<input id="staff" type="number" min="1" max="${b.level * 5}" value="${plannedStaff(b)}"></label>${hiringControls(b, esc)}<label class="field">Monthly marketing budget<input id="marketing" type="number" min="0" max="100000" step="100" value="${b.marketing}"></label><label class="field">Product quality<select id="quality">${[1, 2, 3].map((n) => `<option value="${n}" ${b.quality === n ? "selected" : ""}>${["Standard", "Premium (+15% material costs)", "Exceptional (+30% material costs)"][n - 1]}</option>`).join("")}</select></label>${btn("Save operating plan", "plan:" + b.id)}<p class="explain">Demand responds to price, reputation, marketing, the economy, and research. Premium quality raises demand and reputation but costs more to produce. Recruitment takes 1–3 months before candidate acceptance and onboarding. Fees depend on channel; severance costs 35% of a local base monthly wage per employee. Rent: ${money(t.rent * b.level * s.inflation * city(b).rent)}/month. Manage morale, suppliers, and projects in Operations.</p></section><div class="stack"><section class="card"><h2>Next month’s outlook</h2><div class="balance-line"><span>Estimated sales</span><b>${money(f.revenue)}</b></div><div class="balance-line"><span>Materials & operating commitments</span><b>−${money(f.expense)}</b></div><div class="balance-line total"><span>Operating profit</span><b class="${f.profit >= 0 ? "positive" : "negative"}">${money(f.profit)}</b></div><p class="explain">An estimate, not a guarantee. Demand varies ±15%. ${b.lost ? b.lost + " customers were unserved last month." : ""} Cash is needed to buy materials before sales arrive.</p></section><section class="card"><h2>Inventory & growth</h2><div class="balance-line"><span>Materials in stock</span><b>${b.inventory} units</b></div><label class="field">Purchasing policy<select id="auto" data-business="${b.id}"><option value="yes" ${b.auto ? "selected" : ""}>Automatic · buy for monthly demand</option><option value="no" ${!b.auto ? "selected" : ""}>Manual · use existing inventory only</option></select></label><div class="actions">${btn("Buy 100 units · " + money(f.unit * 100), "stock:" + b.id, "light", s.cash < f.unit * 100)}${btn("Expand · " + money(exp), "expand:" + b.id, "", s.cash < exp || b.level >= 10)}</div><p class="explain">Expansion unlocks 5 more employee slots. It also raises rent; hire staff to use the new capacity. Maximum level 10.</p></section><section class="card"><h2>Exit strategy</h2><p class="explain">Sell the company for ${money(t.cost * b.level * 0.75)} plus inventory at its recorded acquisition cost. This ends its income and expenses.</p><br>${btn("Sell business", "sellbusiness:" + b.id, "danger")}</section></div></div>`
   );
 }
 function catalog() {
@@ -441,6 +442,10 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   let [a, id, mode] = el.dataset.action.split(":");
   let b = s.businesses.find((b) => String(b.id) === id);
+  if (a === "recipe") {
+    recipeAction(el.dataset.action.split(":"), s, { changed, toast });
+    return;
+  }
   if (a === "deal") {
     integrationAction(el.dataset.action.split(":"), s, {
       changed,

@@ -1,5 +1,5 @@
-import { consumeStock } from "./inventory.js?v=50124d33bf5b";
-import { TYPES } from "./catalog.js?v=50124d33bf5b";
+import { consumeStock } from "./inventory.js?v=830bc158a7cf";
+import { TYPES } from "./catalog.js?v=830bc158a7cf";
 export const FACILITY_MODULES = [
   {
     id: "equipment",

@@ -27,6 +27,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - **Product portfolios:** up to eight products per company, two concurrent development projects, three investment tiers, three audience segments, timed launches, support costs, cannibalization, aging, refreshes, and retirement. Rival pricing responds to undercutting and profitable expansion.
 - Pricing elasticity, industry seasonality, macroeconomic exposure, staffing, wages, product quality, marketing, reputation, loyalty, customer segments, and compliance.
 - Employee morale, skill development, resignations, three recruitment channels, 1–3 month hiring lead times, salary-sensitive candidate acceptance, retries, weighted team skill, two-month onboarding, severance and six specialist executive roles. Headcount targets first create vacancies; payroll begins when candidates actually join.
+- Optional physical multi-input recipes for 13 industries: two-month installation, scarce-component bottlenecks, fixed material lots, quality/research input requirements, coordination overhead, shared stocks and actual acquisition-cost consumption. Hybrid procurement can buy generic stock when a component runs out.
 - Direct suppliers or a shared raw-material warehouse; spot and guaranteed supply policies, shipping delays, freight, storage, spoilage, and cross-industry cost savings.
 - Equipment breakdowns, maintenance, insurance, deductibles, continuity programs, and regulatory audits.
 - Business-level product/process projects, three basic research tracks, and twelve corporate technologies with prerequisites.
@@ -90,7 +91,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 121 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 127 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -106,6 +107,7 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 - `dist/acquisitions.js`, `acquisition-ui.js`: integration plans, disruption, funding pauses and seller financing.
 - `dist/tax.js`: tax provisions, quarterly settlements and expiring loss carryforwards.
 - `dist/workforce.js`: recruitment channels, vacancies, candidate acceptance and onboarding.
+- `dist/recipes.js`, `recipe-ui.js`: multi-input production lines and commodity bottlenecks.
 - `dist/catalog.js`: industry definitions and sector characteristics.
 - `dist/commerce.js`, `commerce-ui.js`: supply agreements, trade credit, internal production routes, customer risk, factoring, and commitments.
 - `dist/facilities.js`, `facility-ui.js`: physical bottlenecks, construction, shifts, maintenance, and storage.

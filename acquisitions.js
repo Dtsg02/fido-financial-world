@@ -149,3 +149,8 @@ export function integrationBlock(s, b) {
     (s.deals?.notes || []).some((n) => n.businessId === b.id)
   );
 }
+
+export function integrationBudget(b) {
+  const x = b.integration;
+  return x?.status === "active" ? x.price * INTEGRATION_PLANS[x.plan].cost : 0;
+}

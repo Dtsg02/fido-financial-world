@@ -2,11 +2,11 @@ import {
   INTEGRATION_PLANS,
   acquisitionQuote,
   recordAcquisition,
-} from "./acquisitions.js?v=50124d33bf5b";
-import { integrationContent } from "./acquisition-ui.js?v=50124d33bf5b";
-import { invoicePolicy } from "./commerce.js?v=50124d33bf5b";
-import { ensureLate, regionFor } from "./late.js?v=50124d33bf5b";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=50124d33bf5b";
+} from "./acquisitions.js?v=830bc158a7cf";
+import { integrationContent } from "./acquisition-ui.js?v=830bc158a7cf";
+import { invoicePolicy } from "./commerce.js?v=830bc158a7cf";
+import { ensureLate, regionFor } from "./late.js?v=830bc158a7cf";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=830bc158a7cf";
 import {
   CITIES,
   SUPPLIERS,
@@ -20,7 +20,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js?v=50124d33bf5b";
+} from "./world.js?v=830bc158a7cf";
 export const strategyPages = [
   "World",
   "Operations",
@@ -221,7 +221,7 @@ export function strategyAction(parts, s, h) {
       });
       recordAcquisition(s, acquired, r.value, plan, financing);
       s.world.rivals = s.world.rivals.filter((x) => x !== r);
-      log(s, "Acquisition premium: " + r.name, base - r.value);
+      log(s, "Acquisition consideration: " + r.name, -r.value);
       close();
       changed(
         "Acquisition completed. Integration and any seller financing start next month.",

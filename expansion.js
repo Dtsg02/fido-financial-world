@@ -1,4 +1,5 @@
-import { warehouseValues } from "./inventory.js?v=50124d33bf5b";
+import { recipeContent } from "./recipe-ui.js?v=830bc158a7cf";
+import { warehouseValues } from "./inventory.js?v=830bc158a7cf";
 import {
   TYPES,
   ASSETS,
@@ -8,8 +9,8 @@ import {
   advance,
   resolve,
   log,
-} from "./engine.js?v=50124d33bf5b";
-import { INDUSTRY } from "./catalog.js?v=50124d33bf5b";
+} from "./engine.js?v=830bc158a7cf";
+import { INDUSTRY } from "./catalog.js?v=830bc158a7cf";
 import {
   COMMODITIES,
   CITIES,
@@ -17,7 +18,7 @@ import {
   productivity,
   materialFactor,
   demandFactor,
-} from "./world.js?v=50124d33bf5b";
+} from "./world.js?v=830bc158a7cf";
 import {
   ROLES,
   FX,
@@ -47,7 +48,7 @@ import {
   customerMultiplier,
   deepMaterial,
   deepCapacity,
-} from "./empire.js?v=50124d33bf5b";
+} from "./empire.js?v=830bc158a7cf";
 export const expansionPages = [
   "Supply",
   "Talent",
@@ -71,7 +72,8 @@ export function expansionContent(page, s, h) {
         "The things your businesses run on.",
         "Buy raw materials ahead of time. Balance price, delivery time, and storage costs.",
       ) +
-      `<div class="stats">${stat("Warehouse value", money(warehouseValues(s).reduce((n, v) => n + v, 0)), "Recorded acquisition cost, including freight", "Properties")}${stat("Inbound shipments", e.shipments.length, "Owned assets in transit", "Markets")}${stat("Connected businesses", s.businesses.filter((b) => b.warehouse).length, "Production draws from shared inventory", "Businesses")}${stat("Monthly storage", money(e.warehouse.reduce((n, v, i) => n + v * s.world.commodities[i] * 0.005, 0)), "0.5% of warehouse market value", "wallet")}</div><div class="detail-grid">${section("Procurement desk", `<label class="field">Commodity<select id="warehouseCommodity">${COMMODITIES.map((c, i) => `<option value="${i}">${c.name} · ${money(s.world.commodities[i])} / lot</option>`).join("")}</select></label><label class="field">Lots to order<input id="warehouseLots" type="number" min="1" max="100000" value="10"></label><label class="field">Shipping<select id="warehouseMode"><option value="standard">Standard · 2 months · 2.5% freight</option><option value="express">Express · 1 month · 8% freight</option></select></label>${btn("Review purchase", "x:warehousequote")}<p class="explain">Prices are locked when you order. Warehouse stock is shared. Each business draws material lots equal to its material cost divided by the commodity index. Food stock loses ${has(s, "coldchain") ? "0.5" : "2"}% per month. A logistics company and routing research reduce freight charges.</p>`)}${section("Inventory & arrivals", COMMODITIES.map((c, i) => `<div class="balance-line"><span>${c.name}</span><b>${e.warehouse[i].toFixed(2)} lots</b></div>`).join("") + `<h3 style="margin-top:22px">In transit</h3>${e.shipments.map((x) => `<div class="balance-line"><span>${COMMODITIES[x.index].name} · ${x.lots} lots</span><b>Month ${x.due + 1}</b></div>`).join("") || '<p class="explain">No inbound shipments.</p>'}`)}</div><section class="card" style="margin-top:22px"><h2>Connect your production network</h2>${s.businesses.map((b) => `<div class="network-row"><div><h3>${esc(b.name)}</h3><small>${COMMODITIES[INDUSTRY[b.type].commodity].name} · ${city(b).name}</small></div><label class="field">Procurement source<select id="source-${b.id}"><option value="supplier" ${!b.warehouse ? "selected" : ""}>Direct supplier</option><option value="hybrid" ${b.warehouse && b.warehouseFallback ? "selected" : ""}>Warehouse, then direct supplier</option><option value="only" ${b.warehouse && !b.warehouseFallback ? "selected" : ""}>Warehouse only · stop if empty</option></select></label>${btn("Update", "x:source:" + b.id, "small light")}</div>`).join("") || '<p class="explain">Start a company to connect it to your warehouse.</p>'}<p class="explain">Automatic purchasing must be enabled in the business screen for any production to replenish. Warehouse stock avoids direct supplier delivery failures, but you must order ahead. Buying bulk is a hedge against rising input prices, not a guaranteed discount.</p></section>`
+      `<div class="stats">${stat("Warehouse value", money(warehouseValues(s).reduce((n, v) => n + v, 0)), "Recorded acquisition cost, including freight", "Properties")}${stat("Inbound shipments", e.shipments.length, "Owned assets in transit", "Markets")}${stat("Connected businesses", s.businesses.filter((b) => b.warehouse).length, "Production draws from shared inventory", "Businesses")}${stat("Monthly storage", money(e.warehouse.reduce((n, v, i) => n + v * s.world.commodities[i] * 0.005, 0)), "0.5% of warehouse market value", "wallet")}</div><div class="detail-grid">${section("Procurement desk", `<label class="field">Commodity<select id="warehouseCommodity">${COMMODITIES.map((c, i) => `<option value="${i}">${c.name} · ${money(s.world.commodities[i])} / lot</option>`).join("")}</select></label><label class="field">Lots to order<input id="warehouseLots" type="number" min="1" max="100000" value="10"></label><label class="field">Shipping<select id="warehouseMode"><option value="standard">Standard · 2 months · 2.5% freight</option><option value="express">Express · 1 month · 8% freight</option></select></label>${btn("Review purchase", "x:warehousequote")}<p class="explain">Prices are locked when you order. Warehouse stock is shared. Standard processes draw one commodity using current material cost. Installed multi-input lines use the physical recipes below. Food stock loses ${has(s, "coldchain") ? "0.5" : "2"}% per month. A logistics company and routing research reduce freight charges.</p>`)}${section("Inventory & arrivals", COMMODITIES.map((c, i) => `<div class="balance-line"><span>${c.name}</span><b>${e.warehouse[i].toFixed(2)} lots</b></div>`).join("") + `<h3 style="margin-top:22px">In transit</h3>${e.shipments.map((x) => `<div class="balance-line"><span>${COMMODITIES[x.index].name} · ${x.lots} lots</span><b>Month ${x.due + 1}</b></div>`).join("") || '<p class="explain">No inbound shipments.</p>'}`)}</div><section class="card" style="margin-top:22px"><h2>Connect your production network</h2>${s.businesses.map((b) => `<div class="network-row"><div><h3>${esc(b.name)}</h3><small>${COMMODITIES[INDUSTRY[b.type].commodity].name} · ${city(b).name}</small></div><label class="field">Procurement source<select id="source-${b.id}"><option value="supplier" ${!b.warehouse ? "selected" : ""}>Direct supplier</option><option value="hybrid" ${b.warehouse && b.warehouseFallback ? "selected" : ""}>Warehouse, then direct supplier</option><option value="only" ${b.warehouse && !b.warehouseFallback ? "selected" : ""}>Warehouse only · stop if empty</option></select></label>${btn("Update", "x:source:" + b.id, "small light")}</div>`).join("") || '<p class="explain">Start a company to connect it to your warehouse.</p>'}<p class="explain">Automatic purchasing must be enabled in the business screen for any production to replenish. Warehouse stock avoids direct supplier delivery failures, but you must order ahead. Buying bulk is a hedge against rising input prices, not a guaranteed discount.</p></section>` +
+      recipeContent(s, h)
     );
   if (page === "Talent")
     return (
