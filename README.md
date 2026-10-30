@@ -41,7 +41,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - Customer underwriting sets the price and payment risk of new B2B contracts. Late invoices enter collection; third missed attempts default with partial recovery. Factoring exchanges future collections for immediate cash at a fee.
 - Six-month commitment calendars separate supplier liabilities, future orders, construction installments, amortizing loans, coupons and bullet maturities. Twelve-month liquidity drills compare three invoice-collection outcomes.
 - Facility equipment, utilities, workforce, and storage create distinct bottlenecks. Four ten-level upgrade tracks have construction periods, staged funding, funding pauses, and salvage values. Shift patterns trade output against payroll, morale, and wear.
-- Fifteen contextual quarterly situations provide 45 choices, with temporary effects and delayed outcomes. Pending decisions are preserved until resolved; recent situations are excluded from the next selection.
+- Twenty-five contextual quarterly situations provide 75 choices, with temporary effects and delayed outcomes. Pending decisions are preserved until resolved; recent situations are excluded from the next selection. New situations require real operating conditions such as delayed recruitment, onboarding, production queues, paused integrations, surplus stock, inbound shipments or expiring tax losses. Choices can change actual work, lead times, inventory and recruitment rather than only applying modifiers.
 
 ### Expand
 
@@ -93,7 +93,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 136 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 140 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 

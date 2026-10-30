@@ -1,5 +1,5 @@
-import { CITIES } from "./world.js?v=6e353cd01f78";
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
+import { CITIES } from "./world.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=8218e214890d";
 // Save files are untrusted input. Reject malformed state before replacing a game.
 const finite = (n) => typeof n === "number" && Number.isFinite(n);
 const num = (n, min = 0, max = 1e100) => finite(n) && n >= min && n <= max;

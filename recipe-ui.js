@@ -4,9 +4,9 @@ import {
   recipePlan,
   recipeActive,
   configureRecipe,
-} from "./recipes.js?v=6e353cd01f78";
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
-import { COMMODITIES } from "./world.js?v=6e353cd01f78";
+} from "./recipes.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=8218e214890d";
+import { COMMODITIES } from "./world.js?v=8218e214890d";
 export function recipeContent(s, { money, esc, btn }) {
   return `<section class="card industry-card"><h2>Multi-input production lines</h2><p>Install a physical bill of materials for supported industries. Production consumes all required commodities together; the scarcest component limits output. Quantities are fixed by the recipe, quality and operations research rather than changing with commodity prices. At equal commodity prices the recipe uses 10% fewer material lots than its catalog baseline, but coordination costs $75 per business level each active month. Relative prices can make it more expensive.</p><div class="catalog">${
     s.businesses

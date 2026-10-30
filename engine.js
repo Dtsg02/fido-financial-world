@@ -1,28 +1,28 @@
-import { processBatches, workInProgress } from "./production.js?v=6e353cd01f78";
-import { beforeRecipeMonth, recipeOverhead } from "./recipes.js?v=6e353cd01f78";
-import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=6e353cd01f78";
+import { processBatches, workInProgress } from "./production.js?v=8218e214890d";
+import { beforeRecipeMonth, recipeOverhead } from "./recipes.js?v=8218e214890d";
+import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=8218e214890d";
 import {
   beforeAcquisitionMonth,
   integrationEffects,
   integrationBudget,
   sellerDebt,
   deals,
-} from "./acquisitions.js?v=6e353cd01f78";
-import { taxClose, taxLiability } from "./tax.js?v=6e353cd01f78";
-import { purchasePlan, closeAccounts } from "./accounts.js?v=6e353cd01f78";
+} from "./acquisitions.js?v=8218e214890d";
+import { taxClose, taxLiability } from "./tax.js?v=8218e214890d";
+import { purchasePlan, closeAccounts } from "./accounts.js?v=8218e214890d";
 import {
   stockValue,
   receiveStock,
   consumeStock,
   warehouseValues,
-} from "./inventory.js?v=6e353cd01f78";
-import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=6e353cd01f78";
+} from "./inventory.js?v=8218e214890d";
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=8218e214890d";
 import {
   generateDecision,
   beforeDecisionMonth,
   decisionModifiers,
   resolveDecision,
-} from "./decisions.js?v=6e353cd01f78";
+} from "./decisions.js?v=8218e214890d";
 import {
   facility,
   facilityAssets,
@@ -30,7 +30,7 @@ import {
   facilityOverhead,
   beforeFacilityMonth,
   enforceStorage,
-} from "./facilities.js?v=6e353cd01f78";
+} from "./facilities.js?v=8218e214890d";
 import {
   commerce,
   commercialAssets,
@@ -38,14 +38,14 @@ import {
   beforeCommerceMonth,
   procureSupply,
   routeProduction,
-} from "./commerce.js?v=6e353cd01f78";
+} from "./commerce.js?v=8218e214890d";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=6e353cd01f78";
-import { validateAdvanced } from "./advanced-validation.js?v=6e353cd01f78";
+} from "./sectors.js?v=8218e214890d";
+import { validateAdvanced } from "./advanced-validation.js?v=8218e214890d";
 import {
   ensureLate,
   internationalDemand,
@@ -55,7 +55,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=6e353cd01f78";
+} from "./late.js?v=8218e214890d";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -68,8 +68,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=6e353cd01f78";
-import { validateExtra } from "./validation.js?v=6e353cd01f78";
+} from "./empire.js?v=8218e214890d";
+import { validateExtra } from "./validation.js?v=8218e214890d";
 import {
   ensureWorld,
   initBusiness,
@@ -81,8 +81,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=6e353cd01f78";
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
+} from "./world.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=8218e214890d";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },

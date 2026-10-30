@@ -1,6 +1,6 @@
-import { workInProgress } from "./production.js?v=6e353cd01f78";
-import { stockValue, warehouseValues } from "./inventory.js?v=6e353cd01f78";
-import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=6e353cd01f78";
+import { workInProgress } from "./production.js?v=8218e214890d";
+import { stockValue, warehouseValues } from "./inventory.js?v=8218e214890d";
+import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=8218e214890d";
 export function purchasing(b) {
   return (b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 });
 }

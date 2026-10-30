@@ -2,11 +2,11 @@ import {
   INTEGRATION_PLANS,
   acquisitionQuote,
   recordAcquisition,
-} from "./acquisitions.js?v=6e353cd01f78";
-import { integrationContent } from "./acquisition-ui.js?v=6e353cd01f78";
-import { invoicePolicy } from "./commerce.js?v=6e353cd01f78";
-import { ensureLate, regionFor } from "./late.js?v=6e353cd01f78";
-import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=6e353cd01f78";
+} from "./acquisitions.js?v=8218e214890d";
+import { integrationContent } from "./acquisition-ui.js?v=8218e214890d";
+import { invoicePolicy } from "./commerce.js?v=8218e214890d";
+import { ensureLate, regionFor } from "./late.js?v=8218e214890d";
+import { TYPES, type, start, worth, forecast, log } from "./engine.js?v=8218e214890d";
 import {
   CITIES,
   SUPPLIERS,
@@ -20,7 +20,7 @@ import {
   launchProject,
   canSell,
   financeLoan,
-} from "./world.js?v=6e353cd01f78";
+} from "./world.js?v=8218e214890d";
 export const strategyPages = [
   "World",
   "Operations",

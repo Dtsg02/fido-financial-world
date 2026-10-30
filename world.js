@@ -1,8 +1,8 @@
-import { integrationBlock } from "./acquisitions.js?v=6e353cd01f78";
-import { consumeStock } from "./inventory.js?v=6e353cd01f78";
-import { facility } from "./facilities.js?v=6e353cd01f78";
-import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=6e353cd01f78";
-import { TYPES, INDUSTRY } from "./catalog.js?v=6e353cd01f78";
+import { integrationBlock } from "./acquisitions.js?v=8218e214890d";
+import { consumeStock } from "./inventory.js?v=8218e214890d";
+import { facility } from "./facilities.js?v=8218e214890d";
+import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=8218e214890d";
+import { TYPES, INDUSTRY } from "./catalog.js?v=8218e214890d";
 // Interconnected strategy systems. All randomness uses the save's seeded generator.
 export const CITIES = [
   {

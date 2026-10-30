@@ -1,6 +1,7 @@
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
-import { facility } from "./facilities.js?v=6e353cd01f78";
-import { sectorState } from "./sectors.js?v=6e353cd01f78";
+import { consumeStock } from "./inventory.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=8218e214890d";
+import { facility, facilityLimits } from "./facilities.js?v=8218e214890d";
+import { sectorState } from "./sectors.js?v=8218e214890d";
 const choice = (label, cost, effects, desc, later) => ({
   label,
   cost,
@@ -9,6 +10,275 @@ const choice = (label, cost, effects, desc, later) => ({
   later,
 });
 export const DECISIONS = [
+  {
+    id: "hiringbacklog",
+    title: "Open positions are staying vacant",
+    text: "Repeated candidate declines are delaying your growth plan.",
+    when: (s, b) => b.workforce?.vacancies.some((v) => v.delays > 0),
+    choices: [
+      choice(
+        "Hire a recruiting coordinator",
+        0.02,
+        { recruitmentFast: true, morale: 3 },
+        "Bring all current vacancy searches to their next candidate round in one month; +3 morale. Acceptance is still uncertain.",
+      ),
+      choice(
+        "Improve the employee proposition",
+        0.015,
+        { morale: 8 },
+        "+8 morale; keep existing recruitment timelines.",
+      ),
+      choice(
+        "Freeze the open roles",
+        0,
+        { cancelVacancies: true, morale: -3 },
+        "Cancel current vacancies without a fee refund; −3 morale.",
+      ),
+    ],
+  },
+  {
+    id: "onboardingpressure",
+    title: "New hires are stretching the mentors",
+    text: "Your existing team needs to train newcomers while serving customers.",
+    when: (s, b) => b.workforce?.onboarding.some((c) => c.remaining === 2),
+    choices: [
+      choice(
+        "Fund dedicated mentors",
+        0.018,
+        { onboardingFast: true, morale: 4 },
+        "Move current new hires to their final onboarding stage; +4 morale.",
+      ),
+      choice(
+        "Protect training time",
+        0,
+        { capacity: 0.9, morale: 6 },
+        "+6 morale; −10% capacity for 3 months.",
+      ),
+      choice(
+        "Keep the normal schedule",
+        0,
+        { morale: -3 },
+        "No acceleration; −3 morale.",
+      ),
+    ],
+  },
+  {
+    id: "batchinspection",
+    title: "A production batch needs an assurance review",
+    text: "The process team wants additional verification before releasing work in progress.",
+    when: (s, b) => !!b.production?.jobs.length,
+    choices: [
+      choice(
+        "Commission an independent review",
+        0.015,
+        { rep: 3 },
+        "+3 reputation with no extra batch delay.",
+      ),
+      choice(
+        "Inspect with your own team",
+        0,
+        { batchDelay: 1, rep: 2 },
+        "Delay every current batch by one month; +2 reputation.",
+      ),
+      choice(
+        "Release on the existing checks",
+        0,
+        {},
+        "No immediate change. In 3 months, 65% chance the decision is vindicated; otherwise −12 reputation.",
+        { chance: 0.65, success: { rep: 2 }, failure: { rep: -12 } },
+      ),
+    ],
+  },
+  {
+    id: "productionbacklog",
+    title: "The production queue is crowding out customers",
+    text: "Several batches are competing for the same operating capacity.",
+    when: (s, b) => (b.production?.jobs.length || 0) >= 2,
+    choices: [
+      choice(
+        "Bring in a specialist production crew",
+        0.04,
+        { workRelief: 0.2 },
+        "Complete 20% of the remaining work on every current batch. Minimum lead times still apply.",
+      ),
+      choice(
+        "Reschedule customer commitments",
+        0.01,
+        { demand: 0.94, morale: 5 },
+        "−6% demand for 3 months; +5 morale.",
+      ),
+      choice(
+        "Keep the current queue",
+        0,
+        { morale: -5 },
+        "Preserve cash; −5 morale.",
+      ),
+    ],
+  },
+  {
+    id: "perishablestock",
+    title: "A buyer offers to clear surplus food stock",
+    text: "A large stock buffer creates exposure to spoilage. A clearance sale sacrifices value for cash.",
+    types: ["coffee", "bakery", "restaurant", "farm"],
+    when: (s, b) => b.inventory > 500,
+    choices: [
+      choice(
+        "Liquidate a quarter of stock",
+        0,
+        { liquidateStock: 0.25 },
+        "Sell 25% of current inventory for 65% of its recorded acquisition cost. The remainder of that value is lost.",
+      ),
+      choice(
+        "Promote immediate demand",
+        0.02,
+        { demand: 1.18 },
+        "+18% demand for 3 months. Existing capacity still limits sales.",
+      ),
+      choice(
+        "Keep the full buffer",
+        0,
+        {},
+        "Keep current stock and accept ordinary spoilage exposure.",
+      ),
+    ],
+  },
+  {
+    id: "stalledintegration",
+    title: "The acquired team wants a credible integration plan",
+    text: "A paused integration is creating uncertainty about roles and operating processes.",
+    when: (s, b) => b.integration?.status === "paused",
+    choices: [
+      choice(
+        "Restart with external support",
+        0.025,
+        { resumeIntegration: true, morale: 8 },
+        "Resume the existing integration plan; +8 morale. Normal monthly funding is still required.",
+      ),
+      choice(
+        "Communicate a longer standstill",
+        0.005,
+        { morale: 3 },
+        "+3 morale; integration stays paused.",
+      ),
+      choice(
+        "Leave the pause unexplained",
+        0,
+        { morale: -8, rep: -3 },
+        "−8 morale and −3 reputation.",
+      ),
+    ],
+  },
+  {
+    id: "mergerculture",
+    title: "The acquired company resists the new operating model",
+    text: "The transition is exposing differences in working practices and customer relationships.",
+    when: (s, b) => b.integration?.status === "active",
+    choices: [
+      choice(
+        "Fund joint process design",
+        0.03,
+        { morale: 10, capacity: 1.05 },
+        "+10 morale; +5% capacity for 3 months.",
+      ),
+      choice(
+        "Keep local customer practices",
+        0.012,
+        { rep: 5 },
+        "+5 reputation; no change to integration timing.",
+      ),
+      choice(
+        "Enforce the timetable",
+        0,
+        { morale: -7, capacity: 0.95 },
+        "−7 morale; −5% capacity for 3 months.",
+      ),
+    ],
+  },
+  {
+    id: "componentdelay",
+    title: "A freight partner offers priority handling",
+    text: "A shipment in transit can be advanced, helping protect future production.",
+    when: (s, b) =>
+      b.warehouse &&
+      (s.empire?.shipments || []).some((x) => x.due > s.month + 1),
+    choices: [
+      choice(
+        "Pay for priority handling",
+        0.01,
+        { expediteInbound: true },
+        "Advance the earliest eligible inbound shipment by one month. The fee becomes part of its acquisition cost.",
+      ),
+      choice(
+        "Prepare for disrupted service",
+        0.005,
+        { rep: 2, morale: 3 },
+        "+2 reputation and +3 morale; the shipment schedule is unchanged.",
+      ),
+      choice(
+        "Keep the original shipment",
+        0,
+        {},
+        "Preserve cash and keep the original arrival date.",
+      ),
+    ],
+  },
+  {
+    id: "storagepressure",
+    title: "Buffer stock is consuming storage headroom",
+    text: "Purchasing resilience is becoming a physical storage problem.",
+    when: (s, b) =>
+      b.inventory > facilityLimits(b, 0).storage * 0.75 &&
+      (b.purchasing?.buffer || 0) > 0,
+    choices: [
+      choice(
+        "Return to demand-only spot purchasing",
+        0,
+        { buffer: 0 },
+        "Set this company’s extra spot-purchasing buffer to zero. Standing supply agreements remain binding.",
+      ),
+      choice(
+        "Clear a quarter of stock",
+        0,
+        { liquidateStock: 0.25 },
+        "Sell 25% of stock for 65% of recorded acquisition cost; the discount is a loss.",
+      ),
+      choice(
+        "Keep the buffer unchanged",
+        0,
+        {},
+        "Keep current purchasing policy and accept overflow risk.",
+      ),
+    ],
+  },
+  {
+    id: "lossvintage",
+    title: "Old tax losses are approaching expiry",
+    text: "A loss vintage will expire within a year. Growth could use some relief, but spending only for a tax benefit can still destroy value.",
+    minLevel: 2,
+    when: (s, b) =>
+      (s.taxOffice?.losses || []).some((l) => l.expires <= s.month + 12),
+    choices: [
+      choice(
+        "Fund a measured demand campaign",
+        0.025,
+        { demand: 1.12 },
+        "+12% demand for 3 months. Loss relief still requires actual modeled taxable profit.",
+      ),
+      choice(
+        "Improve delivery efficiency",
+        0.025,
+        { capacity: 1.1 },
+        "+10% capacity for 3 months; demand may remain the bottleneck.",
+      ),
+      choice(
+        "Let commercial demand guide spending",
+        0,
+        {},
+        "Preserve cash. Unused losses still expire on their original dates.",
+      ),
+    ],
+  },
+
   {
     id: "retention",
     title: "Your best people have competing offers",
@@ -425,8 +695,38 @@ export function decisionModifiers(s, b) {
     ),
   };
 }
-function apply(s, b, e, current = false) {
+function apply(s, b, e, current = false, paid = 0) {
   if (!b) return;
+  if (e.recruitmentFast)
+    for (const v of b.workforce?.vacancies || []) v.remaining = 1;
+  if (e.cancelVacancies && b.workforce) b.workforce.vacancies = [];
+  if (e.onboardingFast)
+    for (const c of b.workforce?.onboarding || []) c.remaining = 1;
+  if (e.batchDelay)
+    for (const j of b.production?.jobs || []) j.due += e.batchDelay;
+  if (e.workRelief)
+    for (const j of b.production?.jobs || [])
+      j.remainingWork = Math.floor(j.remainingWork * (1 - e.workRelief));
+  if (e.liquidateStock) {
+    const cost = consumeStock(b, Math.floor(b.inventory * e.liquidateStock));
+    s.cash += cost * 0.65;
+  }
+  if (e.resumeIntegration && b.integration?.status === "paused")
+    b.integration.status = "active";
+  if (e.buffer !== undefined) {
+    b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 };
+    b.purchasing.buffer = e.buffer;
+  }
+  if (e.expediteInbound) {
+    const shipment = (s.empire?.shipments || [])
+      .filter((x) => x.due > s.month + 1)
+      .sort((a, b) => a.due - b.due)[0];
+    if (shipment) {
+      shipment.due--;
+      shipment.freight += paid;
+    }
+  }
+
   if (e.rep) b.reputation = bound(b.reputation + e.rep, 30, 100);
   if (e.morale) b.morale = bound(b.morale + e.morale, 20, 100);
   if (e.condition)
@@ -450,6 +750,7 @@ export function generateDecision(s, random) {
         (e) =>
           (!e.types || e.types.includes(b.type)) &&
           b.level >= (e.minLevel || 1) &&
+          (!e.when || e.when(s, b)) &&
           !d.recent.includes(e.id),
       ).map((e) => ({ b, e })),
     );
@@ -486,7 +787,7 @@ export function resolveDecision(s, index, random) {
     cost = t(b).cost * c.cost;
   if (s.cash < cost) return false;
   s.cash -= cost;
-  apply(s, b, c.effects);
+  apply(s, b, c.effects, false, cost);
   if (c.later)
     decisions(s).pending.push({
       decisionId: e.id,

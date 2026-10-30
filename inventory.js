@@ -1,4 +1,4 @@
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
+import { TYPES } from "./catalog.js?v=8218e214890d";
 // Legacy saves have quantities only; their one-time opening basis uses catalog cost.
 export function stockValue(b) {
   if (b.inventoryCost === undefined)

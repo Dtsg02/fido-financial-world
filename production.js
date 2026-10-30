@@ -1,6 +1,6 @@
-import { facilityLimits } from "./facilities.js?v=6e353cd01f78";
-import { recipePlan } from "./recipes.js?v=6e353cd01f78";
-import { warehouseValues, receiveStock } from "./inventory.js?v=6e353cd01f78";
+import { facilityLimits } from "./facilities.js?v=8218e214890d";
+import { recipePlan } from "./recipes.js?v=8218e214890d";
+import { warehouseValues, receiveStock } from "./inventory.js?v=8218e214890d";
 export const BATCH_METHODS = {
   standard: {
     name: "Standard batch",

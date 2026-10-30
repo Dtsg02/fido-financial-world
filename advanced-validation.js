@@ -1,13 +1,13 @@
-import { BATCH_METHODS } from "./production.js?v=6e353cd01f78";
-import { RECIPES } from "./recipes.js?v=6e353cd01f78";
-import { RECRUITMENT } from "./workforce.js?v=6e353cd01f78";
-import { INTEGRATION_PLANS } from "./acquisitions.js?v=6e353cd01f78";
-import { DECISIONS } from "./decisions.js?v=6e353cd01f78";
-import { FACILITY_MODULES } from "./facilities.js?v=6e353cd01f78";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=6e353cd01f78";
-import { TYPES } from "./catalog.js?v=6e353cd01f78";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=6e353cd01f78";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=6e353cd01f78";
+import { BATCH_METHODS } from "./production.js?v=8218e214890d";
+import { RECIPES } from "./recipes.js?v=8218e214890d";
+import { RECRUITMENT } from "./workforce.js?v=8218e214890d";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=8218e214890d";
+import { DECISIONS } from "./decisions.js?v=8218e214890d";
+import { FACILITY_MODULES } from "./facilities.js?v=8218e214890d";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=8218e214890d";
+import { TYPES } from "./catalog.js?v=8218e214890d";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=8218e214890d";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=8218e214890d";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;

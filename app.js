@@ -1,35 +1,35 @@
-import { productionContent, productionAction } from "./production-ui.js?v=6e353cd01f78";
-import { workInProgress } from "./production.js?v=6e353cd01f78";
-import { recipeAction } from "./recipe-ui.js?v=6e353cd01f78";
+import { productionContent, productionAction } from "./production-ui.js?v=8218e214890d";
+import { workInProgress } from "./production.js?v=8218e214890d";
+import { recipeAction } from "./recipe-ui.js?v=8218e214890d";
 import {
   plannedStaff,
   staffingQuote,
   setStaffing,
   hiringControls,
-} from "./workforce.js?v=6e353cd01f78";
-import { sellerDebt } from "./acquisitions.js?v=6e353cd01f78";
-import { taxLiability } from "./tax.js?v=6e353cd01f78";
-import { bondDebt } from "./bonds.js?v=6e353cd01f78";
-import { commercialAssets } from "./commerce.js?v=6e353cd01f78";
-import { integrationAction } from "./acquisition-ui.js?v=6e353cd01f78";
-import { accountsContent, accountsAction } from "./accounts-ui.js?v=6e353cd01f78";
-import { stockValue, receiveStock } from "./inventory.js?v=6e353cd01f78";
-import { bondContent, bondAction } from "./bond-ui.js?v=6e353cd01f78";
-import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=6e353cd01f78";
-import { facilityContent, facilityAction } from "./facility-ui.js?v=6e353cd01f78";
-import { facilityAssets } from "./facilities.js?v=6e353cd01f78";
-import { commerceContent, commerceAction } from "./commerce-ui.js?v=6e353cd01f78";
-import { industryContent, industryAction } from "./industry-ui.js?v=6e353cd01f78";
-import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=6e353cd01f78";
-import { ensureLate, lateAssets } from "./late.js?v=6e353cd01f78";
+} from "./workforce.js?v=8218e214890d";
+import { sellerDebt } from "./acquisitions.js?v=8218e214890d";
+import { taxLiability } from "./tax.js?v=8218e214890d";
+import { bondDebt } from "./bonds.js?v=8218e214890d";
+import { commercialAssets } from "./commerce.js?v=8218e214890d";
+import { integrationAction } from "./acquisition-ui.js?v=8218e214890d";
+import { accountsContent, accountsAction } from "./accounts-ui.js?v=8218e214890d";
+import { stockValue, receiveStock } from "./inventory.js?v=8218e214890d";
+import { bondContent, bondAction } from "./bond-ui.js?v=8218e214890d";
+import { decisionCard, decisionContent, resolveDecision } from "./decisions.js?v=8218e214890d";
+import { facilityContent, facilityAction } from "./facility-ui.js?v=8218e214890d";
+import { facilityAssets } from "./facilities.js?v=8218e214890d";
+import { commerceContent, commerceAction } from "./commerce-ui.js?v=8218e214890d";
+import { industryContent, industryAction } from "./industry-ui.js?v=8218e214890d";
+import { endgamePages, endgameContent, endgameAction } from "./endgame.js?v=8218e214890d";
+import { ensureLate, lateAssets } from "./late.js?v=8218e214890d";
 import {
   expansionPages,
   expansionContent,
   expansionAction,
-} from "./expansion.js?v=6e353cd01f78";
-import { ensureEmpire, additionalAssets } from "./empire.js?v=6e353cd01f78";
-import { ensureWorld, canSell, city } from "./world.js?v=6e353cd01f78";
-import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=6e353cd01f78";
+} from "./expansion.js?v=8218e214890d";
+import { ensureEmpire, additionalAssets } from "./empire.js?v=8218e214890d";
+import { ensureWorld, canSell, city } from "./world.js?v=8218e214890d";
+import { strategyPages, strategyContent, strategyAction } from "./strategy.js?v=8218e214890d";
 import {
   TYPES,
   ASSETS,
@@ -45,7 +45,7 @@ import {
   resolve,
   log,
   valid,
-} from "./engine.js?v=6e353cd01f78";
+} from "./engine.js?v=8218e214890d";
 const $ = (s) => document.querySelector(s),
   money = (n) =>
     new Intl.NumberFormat("en-US", {
