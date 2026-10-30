@@ -1,8 +1,8 @@
-import { recipeActive, recipeProduction } from "./recipes.js?v=830bc158a7cf";
-import { commerce } from "./commerce.js?v=830bc158a7cf";
-import { warehouseValues } from "./inventory.js?v=830bc158a7cf";
-import { TYPES, INDUSTRY } from "./catalog.js?v=830bc158a7cf";
-import { rng, ensureWorld, city, supplier, report } from "./world.js?v=830bc158a7cf";
+import { recipeActive, recipeProduction } from "./recipes.js?v=6e353cd01f78";
+import { commerce } from "./commerce.js?v=6e353cd01f78";
+import { warehouseValues } from "./inventory.js?v=6e353cd01f78";
+import { TYPES, INDUSTRY } from "./catalog.js?v=6e353cd01f78";
+import { rng, ensureWorld, city, supplier, report } from "./world.js?v=6e353cd01f78";
 export const ROLES = [
   {
     id: "coo",

@@ -1,5 +1,6 @@
-import { stockValue, warehouseValues } from "./inventory.js?v=830bc158a7cf";
-import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=830bc158a7cf";
+import { workInProgress } from "./production.js?v=6e353cd01f78";
+import { stockValue, warehouseValues } from "./inventory.js?v=6e353cd01f78";
+import { tradeLiabilities, commerce, commitmentCalendar } from "./commerce.js?v=6e353cd01f78";
 export function purchasing(b) {
   return (b.purchasing ??= { buffer: 0, reserve: 0, batch: 1 });
 }
@@ -56,7 +57,8 @@ export function workingCapital(s) {
     transit,
     receivables,
     payables,
-    tiedUp: stock + raw + transit + receivables - payables,
+    workInProgress: workInProgress(s),
+    tiedUp: stock + raw + transit + receivables - payables + workInProgress(s),
   };
 }
 export function closeAccounts(s, openingCash) {

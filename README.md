@@ -27,6 +27,7 @@ Open http://localhost:4173. The local server requires Python 3. There are no run
 - **Product portfolios:** up to eight products per company, two concurrent development projects, three investment tiers, three audience segments, timed launches, support costs, cannibalization, aging, refreshes, and retirement. Rival pricing responds to undercutting and profitable expansion.
 - Pricing elasticity, industry seasonality, macroeconomic exposure, staffing, wages, product quality, marketing, reputation, loyalty, customer segments, and compliance.
 - Employee morale, skill development, resignations, three recruitment channels, 1–3 month hiring lead times, salary-sensitive candidate acceptance, retries, weighted team skill, two-month onboarding, severance and six specialist executive roles. Headcount targets first create vacancies; payroll begins when candidates actually join.
+- Production queues reserve materials and conversion cash as work in progress. Standard and lean batches trade material efficiency, yield and 2–3 month minimum lead times. Capacity allocation, paused work, expediting, 50% cancellation recovery, storage overflow and sale restrictions connect the queue to real operations.
 - Optional physical multi-input recipes for 13 industries: two-month installation, scarce-component bottlenecks, fixed material lots, quality/research input requirements, coordination overhead, shared stocks and actual acquisition-cost consumption. Hybrid procurement can buy generic stock when a component runs out.
 - Direct suppliers or a shared raw-material warehouse; spot and guaranteed supply policies, shipping delays, freight, storage, spoilage, and cross-industry cost savings.
 - Equipment breakdowns, maintenance, insurance, deductibles, continuity programs, and regulatory audits.
@@ -84,6 +85,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 - Facility construction is carried at 40% of funds paid and completed upgrades at 50% of investment. Internal transfers use 90% of current material value to determine physical yield, with 2.5% freight capitalized into output acquisition cost; this is not a physical bill of materials. Factoring fees, cancellation fees, equity swaps, and issuance costs affect cash/net worth when actioned; they are not a comprehensive accrual ledger.
 - Corporate coupons reduce monthly group profit whether paid or capitalized. Bond maturity failures remain corporate liabilities rather than silently turning into bank loans. Restructuring exchanges debt for 20% cash and 80% outside equity, with no claim of a professional valuation model.
 - Recruitment and severance fees are immediate cash/net-worth costs; they are not yet included in the monthly taxable-income ledger. Cancelled vacancies do not refund fees.
+- Batch materials and conversion fees remain assets until finished goods sell or are written off. Batch cancellation realizes a cash/net-worth loss but is not yet included in the monthly taxable-income ledger.
 - Some journals summarize profit rather than logging every cash movement. Cash flow can differ from reported net profit.
 - Emergency credit prevents a forced game over. This is an open-ended sandbox; sustained losses increase debt rather than deleting your world.
 - Product development and specialist upgrades are immediate cash investments with no separate resale carrying value or depreciation schedule. Subscription demand includes retained customers plus new acquisitions; only served customers are billed. Crop cycles alter available monthly output. Product bonuses apply to retail sales, not previously agreed contract prices.
@@ -91,7 +93,7 @@ This is a fictional single-player simulation, not a model of real financial mark
 
 ## Validation
 
-The suite contains 127 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
+The suite contains 136 tests covering financial boundaries, contracts, warehouses, trading, financing, research, property development, regional access, venture exits, bank capitalization, megaproject staging, scenarios, invalid saves, and a twenty-year diversified simulation with all 24 industries.
 
 ## Hosting for free
 
@@ -108,6 +110,7 @@ Other static hosts can also serve the same folder. Google Fonts is optional; fal
 - `dist/tax.js`: tax provisions, quarterly settlements and expiring loss carryforwards.
 - `dist/workforce.js`: recruitment channels, vacancies, candidate acceptance and onboarding.
 - `dist/recipes.js`, `recipe-ui.js`: multi-input production lines and commodity bottlenecks.
+- `dist/production.js`, `production-ui.js`: batch queues, work in progress, capacity allocation, lead times and liquidation.
 - `dist/catalog.js`: industry definitions and sector characteristics.
 - `dist/commerce.js`, `commerce-ui.js`: supply agreements, trade credit, internal production routes, customer risk, factoring, and commitments.
 - `dist/facilities.js`, `facility-ui.js`: physical bottlenecks, construction, shifts, maintenance, and storage.

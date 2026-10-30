@@ -1,27 +1,28 @@
-import { beforeRecipeMonth, recipeOverhead } from "./recipes.js?v=830bc158a7cf";
-import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=830bc158a7cf";
+import { processBatches, workInProgress } from "./production.js?v=6e353cd01f78";
+import { beforeRecipeMonth, recipeOverhead } from "./recipes.js?v=6e353cd01f78";
+import { beforeWorkforceMonth, onboardingCapacity } from "./workforce.js?v=6e353cd01f78";
 import {
   beforeAcquisitionMonth,
   integrationEffects,
   integrationBudget,
   sellerDebt,
   deals,
-} from "./acquisitions.js?v=830bc158a7cf";
-import { taxClose, taxLiability } from "./tax.js?v=830bc158a7cf";
-import { purchasePlan, closeAccounts } from "./accounts.js?v=830bc158a7cf";
+} from "./acquisitions.js?v=6e353cd01f78";
+import { taxClose, taxLiability } from "./tax.js?v=6e353cd01f78";
+import { purchasePlan, closeAccounts } from "./accounts.js?v=6e353cd01f78";
 import {
   stockValue,
   receiveStock,
   consumeStock,
   warehouseValues,
-} from "./inventory.js?v=830bc158a7cf";
-import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=830bc158a7cf";
+} from "./inventory.js?v=6e353cd01f78";
+import { bondDebt, bondMarket, beforeBondMonth } from "./bonds.js?v=6e353cd01f78";
 import {
   generateDecision,
   beforeDecisionMonth,
   decisionModifiers,
   resolveDecision,
-} from "./decisions.js?v=830bc158a7cf";
+} from "./decisions.js?v=6e353cd01f78";
 import {
   facility,
   facilityAssets,
@@ -29,7 +30,7 @@ import {
   facilityOverhead,
   beforeFacilityMonth,
   enforceStorage,
-} from "./facilities.js?v=830bc158a7cf";
+} from "./facilities.js?v=6e353cd01f78";
 import {
   commerce,
   commercialAssets,
@@ -37,14 +38,14 @@ import {
   beforeCommerceMonth,
   procureSupply,
   routeProduction,
-} from "./commerce.js?v=830bc158a7cf";
+} from "./commerce.js?v=6e353cd01f78";
 import {
   sectorEffects,
   sectorDemand,
   beforeSectorMonth,
   afterSectorBusiness,
-} from "./sectors.js?v=830bc158a7cf";
-import { validateAdvanced } from "./advanced-validation.js?v=830bc158a7cf";
+} from "./sectors.js?v=6e353cd01f78";
+import { validateAdvanced } from "./advanced-validation.js?v=6e353cd01f78";
 import {
   ensureLate,
   internationalDemand,
@@ -54,7 +55,7 @@ import {
   beforeLateMonth,
   lateAssets,
   completed,
-} from "./late.js?v=830bc158a7cf";
+} from "./late.js?v=6e353cd01f78";
 import {
   ensureEmpire,
   customerMultiplier,
@@ -67,8 +68,8 @@ import {
   propertyIncome,
   bonus,
   has,
-} from "./empire.js?v=830bc158a7cf";
-import { validateExtra } from "./validation.js?v=830bc158a7cf";
+} from "./empire.js?v=6e353cd01f78";
+import { validateExtra } from "./validation.js?v=6e353cd01f78";
 import {
   ensureWorld,
   initBusiness,
@@ -80,8 +81,8 @@ import {
   beforeMonth,
   afterMonth,
   fulfill,
-} from "./world.js?v=830bc158a7cf";
-import { TYPES } from "./catalog.js?v=830bc158a7cf";
+} from "./world.js?v=6e353cd01f78";
+import { TYPES } from "./catalog.js?v=6e353cd01f78";
 export { TYPES };
 export const ASSETS = [
   { ticker: "WRLD", name: "World index", price: 100, vol: 0.055, div: 0.002 },
@@ -162,6 +163,7 @@ export function worth(s) {
     taxLiability(s) -
     sellerDebt(s) +
     additionalAssets(s) +
+    workInProgress(s) +
     lateAssets(s) +
     commercialAssets(s) +
     s.businesses.reduce(
@@ -272,7 +274,11 @@ export function forecast(s, b) {
       integrationEffects(b).demand,
   );
   demand = sectorDemand(b, demand);
-  let units = Math.min(capacity, demand);
+  const plannedBatchWork = Math.min(
+    Math.floor(capacity * (b.production?.allocation ?? 0)),
+    (b.production?.jobs || []).reduce((n, j) => n + j.remainingWork, 0),
+  );
+  let units = Math.min(capacity - plannedBatchWork, demand);
   let unit =
     t.unit *
     s.inflation *
@@ -344,6 +350,9 @@ export function advance(s) {
       f = forecast(s, b);
     let demand = Math.max(0, Math.floor(f.demand * (0.85 + rand(s) * 0.3)));
     let capacity = Math.floor(f.capacity * (b.incidentFactor || 1));
+    const totalCapacity = capacity,
+      batchWork = processBatches(s, b, capacity);
+    capacity -= batchWork;
     let contractNeed = s.world.contracts
       .filter((c) => c.businessId === b.id && c.status === "active")
       .reduce((n, c) => n + c.units - c.delivered, 0);
@@ -379,8 +388,11 @@ export function advance(s) {
       b.inventory,
     );
     const costOfSales = consumeStock(b, sold) + contract.cost;
-    facility(b).lastUtilization = capacity
-      ? Math.min(1, (sold + contract.units + routed) / capacity)
+    facility(b).lastUtilization = totalCapacity
+      ? Math.min(
+          1,
+          (sold + contract.units + routed + batchWork) / totalCapacity,
+        )
       : 0;
     let sales = sold * f.salePrice + contract.revenue;
     let overhead = f.overhead;

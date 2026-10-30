@@ -1,12 +1,13 @@
-import { RECIPES } from "./recipes.js?v=830bc158a7cf";
-import { RECRUITMENT } from "./workforce.js?v=830bc158a7cf";
-import { INTEGRATION_PLANS } from "./acquisitions.js?v=830bc158a7cf";
-import { DECISIONS } from "./decisions.js?v=830bc158a7cf";
-import { FACILITY_MODULES } from "./facilities.js?v=830bc158a7cf";
-import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=830bc158a7cf";
-import { TYPES } from "./catalog.js?v=830bc158a7cf";
-import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=830bc158a7cf";
-import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=830bc158a7cf";
+import { BATCH_METHODS } from "./production.js?v=6e353cd01f78";
+import { RECIPES } from "./recipes.js?v=6e353cd01f78";
+import { RECRUITMENT } from "./workforce.js?v=6e353cd01f78";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=6e353cd01f78";
+import { DECISIONS } from "./decisions.js?v=6e353cd01f78";
+import { FACILITY_MODULES } from "./facilities.js?v=6e353cd01f78";
+import { SUPPLY_HOUSES, routeAllowed } from "./commerce.js?v=6e353cd01f78";
+import { TYPES } from "./catalog.js?v=6e353cd01f78";
+import { ROLES, RESEARCH, MACRO_EVENTS } from "./empire.js?v=6e353cd01f78";
+import { REGIONS, MEGAPROJECTS, DYNASTY_UPGRADES, SCENARIOS } from "./late.js?v=6e353cd01f78";
 const obj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 const n = (x, min = 0, max = 1e100) =>
   Number.isFinite(x) && x >= min && x <= max;
@@ -50,6 +51,36 @@ function safeTree(x, depth = 0) {
 export function validateAdvanced(s) {
   try {
     if (!safeTree(s)) return false;
+    if (
+      s.businesses?.some((b) => {
+        const p = b.production;
+        return (
+          p &&
+          (!obj(p) ||
+            !i(p.nextId, 1) ||
+            ![0, 0.25, 0.5, 0.75, 1].includes(p.allocation) ||
+            !i(p.lastWork) ||
+            !i(p.lastCompleted) ||
+            !arr(
+              p.jobs,
+              (j) =>
+                obj(j) &&
+                i(j.id, 1) &&
+                Object.hasOwn(BATCH_METHODS, j.method) &&
+                i(j.units, 2, 1000000) &&
+                i(j.output, 1, j.units) &&
+                i(j.remainingWork, 0, j.units) &&
+                n(j.cost) &&
+                i(j.due) &&
+                i(j.created) &&
+                typeof j.expedited === "boolean",
+              5,
+            ) ||
+            (p.jobs.length && !b.recipe?.installed))
+        );
+      })
+    )
+      return false;
     if (
       s.businesses?.some((b) => {
         const r = b.recipe;

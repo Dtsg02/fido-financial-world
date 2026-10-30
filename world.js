@@ -1,8 +1,8 @@
-import { integrationBlock } from "./acquisitions.js?v=830bc158a7cf";
-import { consumeStock } from "./inventory.js?v=830bc158a7cf";
-import { facility } from "./facilities.js?v=830bc158a7cf";
-import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=830bc158a7cf";
-import { TYPES, INDUSTRY } from "./catalog.js?v=830bc158a7cf";
+import { integrationBlock } from "./acquisitions.js?v=6e353cd01f78";
+import { consumeStock } from "./inventory.js?v=6e353cd01f78";
+import { facility } from "./facilities.js?v=6e353cd01f78";
+import { settleCustomers, invoicePolicy, commercialBlock } from "./commerce.js?v=6e353cd01f78";
+import { TYPES, INDUSTRY } from "./catalog.js?v=6e353cd01f78";
 // Interconnected strategy systems. All randomness uses the save's seeded generator.
 export const CITIES = [
   {
@@ -565,7 +565,12 @@ export function launchProject(s, b, id) {
   return true;
 }
 export function canSell(s, b) {
-  if (integrationBlock(s, b) || b.recipe?.remaining > 0) return false;
+  if (
+    integrationBlock(s, b) ||
+    b.recipe?.remaining > 0 ||
+    b.production?.jobs.length
+  )
+    return false;
   return (
     s.event?.businessId !== b.id &&
     !facility(b).projects.length &&

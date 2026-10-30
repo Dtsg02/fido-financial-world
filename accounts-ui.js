@@ -1,11 +1,11 @@
-import { taxOffice, nextTaxMonth } from "./tax.js?v=830bc158a7cf";
+import { taxOffice, nextTaxMonth } from "./tax.js?v=6e353cd01f78";
 import {
   workingCapital,
   purchasing,
   setPurchasing,
   liquidityDrill,
-} from "./accounts.js?v=830bc158a7cf";
-import { stockValue } from "./inventory.js?v=830bc158a7cf";
+} from "./accounts.js?v=6e353cd01f78";
+import { stockValue } from "./inventory.js?v=6e353cd01f78";
 export function accountsContent(s, h) {
   const { heading, money, esc, btn, stat } = h,
     w = workingCapital(s);
@@ -22,7 +22,7 @@ export function accountsContent(s, h) {
     ) +
     `<div class="stats">${stat("Stock at acquisition cost", money(w.stock + w.raw), "Includes raw materials; excludes transit", "Supply")}${stat("Working capital tied up", money(w.tiedUp), "Stock + transit + invoices − trade payables", "Commerce")}${stat("Last cash movement", money(last?.cashChange || 0), "Measured between monthly closes", "Banking")}${stat("Past-due customers", money(w.aging.slice(1).reduce((a, b) => a + b, 0)), "Collections can lag recognized revenue", "Contracts")}</div>
   <div class="detail-grid"><section class="card"><h2>Monthly management statement</h2>${last ? row("Business revenue", last.revenue) + row("Cost of goods sold", -last.cogs) + row("Gross profit", last.gross) + row("Inventory write-offs", -last.writeoffs) + row("Business overhead", -last.overhead) + row("Group modeled net profit", last.profit) + row("Opening cash", last.openingCash) + row("Closing cash", last.closingCash) + row("Cash movement", last.cashChange) + row("Cash movement less modeled profit", last.cashChange - last.profit) : "<p>Advance one month to close your first statement.</p>"}<p class="explain">Management accounts, not audited financial statements. Group profit includes modeled portfolio income, taxes, interest and living costs. Cash differs because of credit, stock purchases, construction, investing and financing. The difference is an aggregate reconciliation, not a categorized cash-flow statement. Actions between turns are outside the monthly opening-to-closing cash window.</p></section>
-  <section class="card"><h2>Collections and working capital</h2>${row("Current / not overdue invoices", w.aging[0]) + row("One month overdue", w.aging[1]) + row("Two months overdue", w.aging[2]) + row("Three or more months overdue", w.aging[3]) + row("Owned goods in transit", w.transit) + row("Supplier payables", -w.payables)}<p class="explain">A sale on credit creates revenue before cash arrives. Supplier credit preserves cash but creates a payable. Internal deliveries create no group revenue; their acquisition cost and freight remain in stock until sold. Use Commerce to collect early through factoring or settle suppliers.</p></section></div>
+  <section class="card"><h2>Collections and working capital</h2>${row("Current / not overdue invoices", w.aging[0]) + row("One month overdue", w.aging[1]) + row("Two months overdue", w.aging[2]) + row("Three or more months overdue", w.aging[3]) + row("Owned goods in transit", w.transit) + row("Work in progress", w.workInProgress) + row("Supplier payables", -w.payables)}<p class="explain">A sale on credit creates revenue before cash arrives. Supplier credit preserves cash but creates a payable. Internal deliveries create no group revenue; their acquisition cost and freight remain in stock until sold. Use Commerce to collect early through factoring or settle suppliers.</p></section></div>
   <section class="card industry-card"><h2>Company margins and purchasing mandates</h2><p>Choose the tradeoff between resilient inventory and cash tied up in stock. Buffers apply to automatic spot purchasing, including planned contract and internal-route production. Standing supply agreements remain binding and can spend below your spot-purchasing reserve.</p><div class="catalog">${
     s.businesses
       .map((b) => {

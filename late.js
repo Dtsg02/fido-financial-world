@@ -1,8 +1,8 @@
-import { warehouseValues } from "./inventory.js?v=830bc158a7cf";
-import { commerce } from "./commerce.js?v=830bc158a7cf";
-import { TYPES, INDUSTRY } from "./catalog.js?v=830bc158a7cf";
-import { CITIES, rng, city, report } from "./world.js?v=830bc158a7cf";
-import { ensureEmpire, has } from "./empire.js?v=830bc158a7cf";
+import { warehouseValues } from "./inventory.js?v=6e353cd01f78";
+import { commerce } from "./commerce.js?v=6e353cd01f78";
+import { TYPES, INDUSTRY } from "./catalog.js?v=6e353cd01f78";
+import { CITIES, rng, city, report } from "./world.js?v=6e353cd01f78";
+import { ensureEmpire, has } from "./empire.js?v=6e353cd01f78";
 export const REGIONS = [
   {
     id: "home",

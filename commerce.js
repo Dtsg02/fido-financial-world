@@ -1,7 +1,7 @@
-import { INTEGRATION_PLANS } from "./acquisitions.js?v=830bc158a7cf";
-import { nextTaxMonth, taxLiability } from "./tax.js?v=830bc158a7cf";
-import { receiveStock, consumeStock } from "./inventory.js?v=830bc158a7cf";
-import { TYPES } from "./catalog.js?v=830bc158a7cf";
+import { INTEGRATION_PLANS } from "./acquisitions.js?v=6e353cd01f78";
+import { nextTaxMonth, taxLiability } from "./tax.js?v=6e353cd01f78";
+import { receiveStock, consumeStock } from "./inventory.js?v=6e353cd01f78";
+import { TYPES } from "./catalog.js?v=6e353cd01f78";
 export const SUPPLY_HOUSES = [
   {
     id: "cooperative",

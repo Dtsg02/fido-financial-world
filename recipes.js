@@ -1,5 +1,5 @@
-import { TYPES } from "./catalog.js?v=830bc158a7cf";
-import { warehouseValues } from "./inventory.js?v=830bc158a7cf";
+import { TYPES } from "./catalog.js?v=6e353cd01f78";
+import { warehouseValues } from "./inventory.js?v=6e353cd01f78";
 // Physical lot proportions: food, industrial materials, energy, compute.
 export const RECIPES = {
   coffee: [0.8, 0.1, 0.1, 0],

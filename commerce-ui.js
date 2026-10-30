@@ -1,4 +1,4 @@
-import { commitmentCalendar } from "./commerce.js?v=830bc158a7cf";
+import { commitmentCalendar } from "./commerce.js?v=6e353cd01f78";
 import {
   commerce,
   SUPPLY_HOUSES,
@@ -12,8 +12,8 @@ import {
   routeAllowed,
   addRoute,
   factorInvoice,
-} from "./commerce.js?v=830bc158a7cf";
-import { forecast } from "./engine.js?v=830bc158a7cf";
+} from "./commerce.js?v=6e353cd01f78";
+import { forecast } from "./engine.js?v=6e353cd01f78";
 export function commerceContent(s, h) {
   const c = commerce(s),
     { heading, btn, money, esc, stat } = h;
